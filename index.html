@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Campanha - Adicione sua Moldura</title>
+  <title>Campanha - Ajuste sua Foto com Moldura</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,6 +17,7 @@
       border: 2px solid #ccc;
       border-radius: 10px;
       background: white;
+      touch-action: none;
     }
     input {
       margin-top: 15px;
@@ -34,7 +35,7 @@
   </style>
 </head>
 <body>
-  <h1>Adicione sua foto com a Moldura da Campanha</h1>
+  <h1>Adicione e Ajuste sua Foto com a Moldura</h1>
   <input type="file" id="upload" accept="image/*">
   <br>
   <canvas id="canvas" width="600" height="600"></canvas>
@@ -42,38 +43,99 @@
   <button id="download">Baixar Imagem Final</button>
 
   <script>
-    const upload = document.getElementById('upload');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
+    const upload = document.getElementById('upload');
     const downloadBtn = document.getElementById('download');
 
-    // Caminho para a sua moldura (PNG com fundo transparente)
     const moldura = new Image();
-    moldura.src = "moldura.png";
+    moldura.src = 'moldura.png';
     let molduraCarregada = false;
-
-    moldura.onload = () => {
-      molduraCarregada = true;
-    };
+    moldura.onload = () => { molduraCarregada = true; desenhar(); };
 
     let foto = null;
+    let fotoX = 0;
+    let fotoY = 0;
+    let scale = 1;
+
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
 
     upload.addEventListener('change', (e) => {
       const reader = new FileReader();
-      reader.onload = function(event) {
+      reader.onload = (event) => {
         foto = new Image();
-        foto.onload = desenhar;
+        foto.onload = () => {
+          // Centralizar a foto inicialmente
+          scale = 1;
+          fotoX = (canvas.width - foto.width) / 2;
+          fotoY = (canvas.height - foto.height) / 2;
+          desenhar();
+        };
         foto.src = event.target.result;
-      }
+      };
       reader.readAsDataURL(e.target.files[0]);
     });
 
     function desenhar() {
-      if (!foto || !molduraCarregada) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(foto, 0, 0, canvas.width, canvas.height);
-      ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+      if (foto && molduraCarregada) {
+        const w = foto.width * scale;
+        const h = foto.height * scale;
+        ctx.drawImage(foto, fotoX, fotoY, w, h);
+        ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+      }
     }
+
+    // Eventos de mouse para arrastar
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      dragStartX = e.offsetX - fotoX;
+      dragStartY = e.offsetY - fotoY;
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        fotoX = e.offsetX - dragStartX;
+        fotoY = e.offsetY - dragStartY;
+        desenhar();
+      }
+    });
+
+    canvas.addEventListener('mouseup', () => { isDragging = false; });
+    canvas.addEventListener('mouseleave', () => { isDragging = false; });
+
+    // Zoom com roda do mouse
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? 0.95 : 1.05;
+      scale *= delta;
+      desenhar();
+    });
+
+    // Toque para mobile
+    let lastTouch = null;
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length == 1) {
+        const touch = e.touches[0];
+        isDragging = true;
+        lastTouch = { x: touch.clientX, y: touch.clientY };
+      }
+    });
+    canvas.addEventListener('touchmove', (e) => {
+      if (isDragging && e.touches.length == 1) {
+        const touch = e.touches[0];
+        const dx = touch.clientX - lastTouch.x;
+        const dy = touch.clientY - lastTouch.y;
+        fotoX += dx;
+        fotoY += dy;
+        lastTouch = { x: touch.clientX, y: touch.clientY };
+        desenhar();
+      }
+      e.preventDefault();
+    }, { passive: false });
+    canvas.addEventListener('touchend', () => { isDragging = false; });
 
     downloadBtn.addEventListener('click', () => {
       const link = document.createElement('a');
