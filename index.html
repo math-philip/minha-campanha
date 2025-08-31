@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campanha - Ajuste sua Foto com Moldura</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -13,24 +14,22 @@
     }
     canvas {
       margin-top: 20px;
-      max-width: 100%;
       border: 2px solid #ccc;
       border-radius: 10px;
       background: white;
-      touch-action: none;
     }
-    input {
+    input, button {
       margin-top: 15px;
-    }
-    button {
-      margin-top: 20px;
       padding: 10px 20px;
       font-size: 16px;
-      cursor: pointer;
       border-radius: 8px;
       border: none;
+      cursor: pointer;
+    }
+    button {
       background-color: #0073e6;
       color: white;
+      margin-right: 10px;
     }
   </style>
 </head>
@@ -40,115 +39,76 @@
   <br>
   <canvas id="canvas" width="600" height="600"></canvas>
   <br>
+  <button id="zoomIn">Aumentar</button>
+  <button id="zoomOut">Diminuir</button>
+  <button id="center">Centralizar</button>
   <button id="download">Baixar Imagem Final</button>
 
   <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const upload = document.getElementById('upload');
-    const downloadBtn = document.getElementById('download');
+    const canvas = new fabric.Canvas('canvas', { preserveObjectStacking: true });
+    let molduraObj = null;
+    let fotoObj = null;
 
-    const moldura = new Image();
-    moldura.src = 'moldura.png';
-    let molduraCarregada = false;
-    moldura.onload = () => { molduraCarregada = true; desenhar(); };
+    fabric.Image.fromURL('moldura.png', function(img) {
+      img.selectable = false;
+      img.evented = false;
+      img.set({ left: 0, top: 0, scaleX: canvas.width / img.width, scaleY: canvas.height / img.height });
+      canvas.add(img);
+      molduraObj = img;
+      canvas.sendToBack(img);
+    });
 
-    let foto = null;
-    let fotoX = 0;
-    let fotoY = 0;
-    let fotoWidth = 0;
-    let fotoHeight = 0;
-    let scale = 1;
-
-    let isDragging = false;
-    let dragStartX = 0;
-    let dragStartY = 0;
-
-    upload.addEventListener('change', (e) => {
+    document.getElementById('upload').addEventListener('change', function(e){
+      const file = e.target.files[0];
       const reader = new FileReader();
-      reader.onload = (event) => {
-        foto = new Image();
-        foto.onload = () => {
-          // Mantém proporção e centraliza
-          const aspect = foto.width / foto.height;
-          if(aspect >= 1){
-            fotoWidth = canvas.width / 2;
-            fotoHeight = fotoWidth / aspect;
-          } else {
-            fotoHeight = canvas.height / 2;
-            fotoWidth = fotoHeight * aspect;
-          }
-          fotoX = (canvas.width - fotoWidth) / 2;
-          fotoY = (canvas.height - fotoHeight) / 2;
-          scale = 1;
-          desenhar();
-        };
-        foto.src = event.target.result;
+      reader.onload = function(f){
+        fabric.Image.fromURL(f.target.result, function(img){
+          img.set({
+            left: canvas.width/2 - img.width/4,
+            top: canvas.height/2 - img.height/4,
+            scaleX: 0.5,
+            scaleY: 0.5,
+            selectable: true
+          });
+          if(fotoObj) canvas.remove(fotoObj);
+          fotoObj = img;
+          canvas.add(img);
+          canvas.setActiveObject(img);
+        });
       };
-      reader.readAsDataURL(e.target.files[0]);
+      reader.readAsDataURL(file);
     });
 
-    function desenhar() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if(foto && molduraCarregada){
-        ctx.drawImage(foto, fotoX, fotoY, fotoWidth * scale, fotoHeight * scale);
-        ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
-      }
-    }
-
-    // Arrastar com mouse
-    canvas.addEventListener('mousedown', (e) => {
-      if(!foto) return;
-      isDragging = true;
-      dragStartX = e.offsetX - fotoX;
-      dragStartY = e.offsetY - fotoY;
-    });
-    canvas.addEventListener('mousemove', (e) => {
-      if(isDragging){
-        fotoX = e.offsetX - dragStartX;
-        fotoY = e.offsetY - dragStartY;
-        desenhar();
+    document.getElementById('zoomIn').addEventListener('click', () => {
+      if(fotoObj){
+        fotoObj.scaleX *= 1.1;
+        fotoObj.scaleY *= 1.1;
+        canvas.renderAll();
       }
     });
-    canvas.addEventListener('mouseup', () => { isDragging = false; });
-    canvas.addEventListener('mouseleave', () => { isDragging = false; });
 
-    // Zoom com roda do mouse
-    canvas.addEventListener('wheel', (e) => {
-      if(!foto) return;
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? 0.95 : 1.05;
-      scale *= delta;
-      desenhar();
-    });
-
-    // Toque para mobile
-    let lastTouch = null;
-    canvas.addEventListener('touchstart', (e) => {
-      if(foto && e.touches.length == 1){
-        const touch = e.touches[0];
-        isDragging = true;
-        lastTouch = { x: touch.clientX, y: touch.clientY };
+    document.getElementById('zoomOut').addEventListener('click', () => {
+      if(fotoObj){
+        fotoObj.scaleX *= 0.9;
+        fotoObj.scaleY *= 0.9;
+        canvas.renderAll();
       }
     });
-    canvas.addEventListener('touchmove', (e) => {
-      if(isDragging && e.touches.length == 1){
-        const touch = e.touches[0];
-        const dx = touch.clientX - lastTouch.x;
-        const dy = touch.clientY - lastTouch.y;
-        fotoX += dx;
-        fotoY += dy;
-        lastTouch = { x: touch.clientX, y: touch.clientY };
-        desenhar();
-      }
-      e.preventDefault();
-    }, { passive: false });
-    canvas.addEventListener('touchend', () => { isDragging = false; });
 
-    downloadBtn.addEventListener('click', () => {
+    document.getElementById('center').addEventListener('click', () => {
+      if(fotoObj){
+        fotoObj.left = (canvas.width - fotoObj.width * fotoObj.scaleX)/2;
+        fotoObj.top = (canvas.height - fotoObj.height * fotoObj.scaleY)/2;
+        canvas.renderAll();
+      }
+    });
+
+    document.getElementById('download').addEventListener('click', function(){
+      if(molduraObj) canvas.bringToFront(molduraObj);
+      const dataURL = canvas.toDataURL({ format: 'png' });
       const link = document.createElement('a');
+      link.href = dataURL;
       link.download = 'minha-foto-campanha.png';
-      link.href = canvas.toDataURL();
       link.click();
     });
   </script>
