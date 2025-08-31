@@ -56,6 +56,8 @@
     let foto = null;
     let fotoX = 0;
     let fotoY = 0;
+    let fotoWidth = 0;
+    let fotoHeight = 0;
     let scale = 1;
 
     let isDragging = false;
@@ -67,10 +69,18 @@
       reader.onload = (event) => {
         foto = new Image();
         foto.onload = () => {
-          // Centralizar a foto inicialmente
+          // Mantém proporção e centraliza
+          const aspect = foto.width / foto.height;
+          if(aspect >= 1){
+            fotoWidth = canvas.width / 2;
+            fotoHeight = fotoWidth / aspect;
+          } else {
+            fotoHeight = canvas.height / 2;
+            fotoWidth = fotoHeight * aspect;
+          }
+          fotoX = (canvas.width - fotoWidth) / 2;
+          fotoY = (canvas.height - fotoHeight) / 2;
           scale = 1;
-          fotoX = (canvas.width - foto.width) / 2;
-          fotoY = (canvas.height - foto.height) / 2;
           desenhar();
         };
         foto.src = event.target.result;
@@ -80,34 +90,32 @@
 
     function desenhar() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (foto && molduraCarregada) {
-        const w = foto.width * scale;
-        const h = foto.height * scale;
-        ctx.drawImage(foto, fotoX, fotoY, w, h);
+      if(foto && molduraCarregada){
+        ctx.drawImage(foto, fotoX, fotoY, fotoWidth * scale, fotoHeight * scale);
         ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
       }
     }
 
-    // Eventos de mouse para arrastar
+    // Arrastar com mouse
     canvas.addEventListener('mousedown', (e) => {
+      if(!foto) return;
       isDragging = true;
       dragStartX = e.offsetX - fotoX;
       dragStartY = e.offsetY - fotoY;
     });
-
     canvas.addEventListener('mousemove', (e) => {
-      if (isDragging) {
+      if(isDragging){
         fotoX = e.offsetX - dragStartX;
         fotoY = e.offsetY - dragStartY;
         desenhar();
       }
     });
-
     canvas.addEventListener('mouseup', () => { isDragging = false; });
     canvas.addEventListener('mouseleave', () => { isDragging = false; });
 
     // Zoom com roda do mouse
     canvas.addEventListener('wheel', (e) => {
+      if(!foto) return;
       e.preventDefault();
       const delta = e.deltaY > 0 ? 0.95 : 1.05;
       scale *= delta;
@@ -117,14 +125,14 @@
     // Toque para mobile
     let lastTouch = null;
     canvas.addEventListener('touchstart', (e) => {
-      if (e.touches.length == 1) {
+      if(foto && e.touches.length == 1){
         const touch = e.touches[0];
         isDragging = true;
         lastTouch = { x: touch.clientX, y: touch.clientY };
       }
     });
     canvas.addEventListener('touchmove', (e) => {
-      if (isDragging && e.touches.length == 1) {
+      if(isDragging && e.touches.length == 1){
         const touch = e.touches[0];
         const dx = touch.clientX - lastTouch.x;
         const dy = touch.clientY - lastTouch.y;
