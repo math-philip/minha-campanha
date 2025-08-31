@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campanha - Adicione sua Moldura</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      background: white;
+    }
+    input {
+      margin-top: 15px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #0073e6;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>Adicione sua foto com a Moldura da Campanha</h1>
+  <input type="file" id="upload" accept="image/*">
+  <br>
+  <canvas id="canvas" width="600" height="600"></canvas>
+  <br>
+  <button id="download">Baixar Imagem Final</button>
+
+  <script>
+    const upload = document.getElementById('upload');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const downloadBtn = document.getElementById('download');
+
+    // 👉 Substitua o caminho abaixo pelo arquivo da sua moldura (PNG com fundo transparente)
+    const moldura = new Image();
+    moldura.src = "moldura.png";
+
+    let foto = null;
+
+    upload.addEventListener('change', (e) => {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        foto = new Image();
+        foto.onload = function() {
+          desenhar();
+        }
+        foto.src = event.target.result;
+      }
+      reader.readAsDataURL(e.target.files[0]);
+    });
+
+    function desenhar() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (foto) {
+        ctx.drawImage(foto, 0, 0, canvas.width, canvas.height);
+      }
+      ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
+    }
+
+    downloadBtn.addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'minha-foto-campanha.png';
+      link.href = canvas.toDataURL();
+      link.click();
+    });
+  </script>
+</body>
+</html>
