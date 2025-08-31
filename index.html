@@ -47,9 +47,14 @@
     const ctx = canvas.getContext('2d');
     const downloadBtn = document.getElementById('download');
 
-    // 👉 Substitua o caminho abaixo pelo arquivo da sua moldura (PNG com fundo transparente)
+    // Caminho para a sua moldura (PNG com fundo transparente)
     const moldura = new Image();
     moldura.src = "moldura.png";
+    let molduraCarregada = false;
+
+    moldura.onload = () => {
+      molduraCarregada = true;
+    };
 
     let foto = null;
 
@@ -57,19 +62,16 @@
       const reader = new FileReader();
       reader.onload = function(event) {
         foto = new Image();
-        foto.onload = function() {
-          desenhar();
-        }
+        foto.onload = desenhar;
         foto.src = event.target.result;
       }
       reader.readAsDataURL(e.target.files[0]);
     });
 
     function desenhar() {
+      if (!foto || !molduraCarregada) return;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (foto) {
-        ctx.drawImage(foto, 0, 0, canvas.width, canvas.height);
-      }
+      ctx.drawImage(foto, 0, 0, canvas.width, canvas.height);
       ctx.drawImage(moldura, 0, 0, canvas.width, canvas.height);
     }
 
