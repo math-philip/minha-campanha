@@ -6,13 +6,17 @@ const resetButton = document.getElementById('reset');
 const downloadButton = document.getElementById('download');
 
 let stage, photoLayer, frameLayer, photo, frame;
-const canvasSize = 800; // quadrado fixo
+const canvasSize = 800; // tamanho quadrado fixo
 
 const initCanvas = () => {
+  // Garantir que o container seja quadrado
+  canvasContainer.style.width = canvasSize + 'px';
+  canvasContainer.style.height = canvasSize + 'px';
+
   stage = new Konva.Stage({
     container: 'canvas-container',
-    width: canvasSize,
-    height: canvasSize
+    width: canvasContainer.offsetWidth,
+    height: canvasContainer.offsetWidth // manter quadrado
   });
 
   // Layer da foto
@@ -68,11 +72,11 @@ fileInput.addEventListener('change', (e) => {
       if (photo) photoLayer.remove(photo);
 
       // Calcular escala para caber dentro do quadrado mantendo proporção
-      const scale = Math.min(canvasSize / img.width, canvasSize / img.height);
+      const scale = Math.min(stage.width() / img.width, stage.height() / img.height);
 
       photo = new Konva.Image({
-        x: (canvasSize - img.width * scale) / 2,
-        y: (canvasSize - img.height * scale) / 2,
+        x: (stage.width() - img.width * scale) / 2,
+        y: (stage.height() - img.height * scale) / 2,
         image: img,
         width: img.width * scale,
         height: img.height * scale,
@@ -103,10 +107,10 @@ zoomOutButton.addEventListener('click', () => {
 
 resetButton.addEventListener('click', () => {
   if (!photo) return;
-  const scale = Math.min(canvasSize / photo.getImage().width, canvasSize / photo.getImage().height);
+  const scale = Math.min(stage.width() / photo.getImage().width, stage.height() / photo.getImage().height);
   photo.setAttrs({
-    x: (canvasSize - photo.getImage().width * scale) / 2,
-    y: (canvasSize - photo.getImage().height * scale) / 2,
+    x: (stage.width() - photo.getImage().width * scale) / 2,
+    y: (stage.height() - photo.getImage().height * scale) / 2,
     scaleX: scale,
     scaleY: scale
   });
