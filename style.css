@@ -49,3 +49,30 @@ body {
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+/* Fundo mesh gradient animado */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
+              radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
+              radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
+  animation: moveGradient 15s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+@keyframes moveGradient {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-25%, -25%) scale(1.2);
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
