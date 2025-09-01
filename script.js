@@ -20,30 +20,34 @@ const initCanvas = () => {
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Overlay circular estilizada
+  // Overlay circular estilo Twibbon com borda tracejada
   overlay = new Konva.Shape({
     sceneFunc: function(ctx, shape) {
       const radius = stage.width() / 2;
       const centerX = stage.width() / 2;
       const centerY = stage.height() / 2;
 
-      // área escura
+      // escurece a área externa
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.fillRect(0, 0, stage.width(), stage.height());
 
-      // círculo transparente central
+      // círculo central transparente
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
       ctx.fill();
 
-      // borda circular leve
+      // volta ao padrão
       ctx.globalCompositeOperation = 'source-over';
+
+      // borda circular tracejada
       ctx.strokeStyle = 'rgba(255,255,255,0.8)';
       ctx.lineWidth = 4;
+      ctx.setLineDash([10, 5]); // 10px de traço, 5px de espaço
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
       ctx.stroke();
+      ctx.setLineDash([]); // reseta para não afetar outros desenhos
     },
     listening: false
   });
@@ -106,7 +110,7 @@ chooseFileBtn.addEventListener('click', () => {
   fileInput.click();
 });
 
-// Upload da foto com fit cover e animação de entrada
+// Upload da foto com fit cover e animação
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
