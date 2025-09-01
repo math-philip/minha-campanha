@@ -32,7 +32,8 @@ const initCanvas = () => {
       image: frameImage,
       width: stage.width(),
       height: stage.height(),
-      draggable: false
+      draggable: false,
+      listening: false // importante: não captura eventos, permite interagir com a foto
     });
     frameLayer.add(frame);
     frameLayer.draw();
