@@ -40,7 +40,7 @@ const initCanvas = () => {
     frameLayer.draw();
   };
 
-  // Transformer (opcional, para mostrar bordas em touch)
+  // Transformer opcional
   transformer = new Konva.Transformer({
     nodes: [],
     rotateEnabled: false,
@@ -59,7 +59,6 @@ const initCanvas = () => {
     photo.scaleX(photo.scaleX() * direction);
     photo.scaleY(photo.scaleY() * direction);
 
-    // centralizar no cursor
     const mousePointTo = {
       x: (pointer.x - photo.x()) / oldScale,
       y: (pointer.y - photo.y()) / oldScale
@@ -68,7 +67,6 @@ const initCanvas = () => {
     photo.y(pointer.y - mousePointTo.y * photo.scaleY());
 
     photoLayer.draw();
-
     if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
   });
 };
@@ -101,7 +99,7 @@ fileInput.addEventListener('change', (e) => {
       transformer.nodes([photo]);
       photoLayer.draw();
 
-      // Configurar slider
+      // Slider
       if (sizeSlider) {
         sizeSlider.value = scale * 100;
         sizeSlider.min = 10;
@@ -130,7 +128,7 @@ if (sizeSlider) {
   });
 }
 
-// Pinch-to-zoom para celular
+// Pinch-to-zoom celular
 canvasContainer.addEventListener('touchmove', (e) => {
   if (!photo || e.touches.length !== 2) return;
   e.preventDefault();
@@ -146,7 +144,6 @@ canvasContainer.addEventListener('touchmove', (e) => {
     photo.scaleX(photo.scaleX() * scaleChange);
     photo.scaleY(photo.scaleY() * scaleChange);
 
-    // centralizar entre os dedos
     const centerX = (touch1.clientX + touch2.clientX) / 2 - canvasContainer.getBoundingClientRect().left;
     const centerY = (touch1.clientY + touch2.clientY) / 2 - canvasContainer.getBoundingClientRect().top;
     const oldScale = photo.scaleX() / scaleChange;
@@ -156,7 +153,6 @@ canvasContainer.addEventListener('touchmove', (e) => {
 
   lastDistance = distance;
   photoLayer.draw();
-
   if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
 });
 
@@ -164,16 +160,33 @@ canvasContainer.addEventListener('touchend', (e) => {
   if (e.touches.length < 2) lastDistance = 0;
 });
 
-// Download
+// Download fixo 800x800px
 downloadButton.addEventListener('click', () => {
-  const containerSize = stage.width();
+  if (!photo || !frame) return;
+
+  const downloadSize = 800;
   const mergedCanvas = document.createElement('canvas');
-  mergedCanvas.width = containerSize;
-  mergedCanvas.height = containerSize;
+  mergedCanvas.width = downloadSize;
+  mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
 
-  ctx.drawImage(photo.getImage(), photo.x(), photo.y(), photo.width() * photo.scaleX(), photo.height() * photo.scaleY());
-  ctx.drawImage(frame.getImage(), frame.x(), frame.y(), frame.width() * frame.scaleX(), frame.height() * frame.scaleY());
+  // Escala proporcional da foto
+  const scaleX = photo.width() * photo.scaleX() / stage.width();
+  const scaleY = photo.height() * photo.scaleY() / stage.height();
+
+  const posX = photo.x() / stage.width() * downloadSize;
+  const posY = photo.y() / stage.height() * downloadSize;
+
+  ctx.drawImage(
+    photo.getImage(),
+    posX,
+    posY,
+    scaleX * downloadSize,
+    scaleY * downloadSize
+  );
+
+  // Moldura
+  ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
 
   const dataURL = mergedCanvas.toDataURL('image/png');
   const a = document.createElement('a');
