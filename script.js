@@ -68,8 +68,10 @@ fileInput.addEventListener('change', (e) => {
         height: img.height / 2,
         draggable: true
       });
+
       layer.add(photo);
-      layer.moveToTop(photo);
+      // Garantir que a moldura fique sempre no topo
+      if (frame) layer.moveToTop(frame);
       layer.draw();
       enableControls();
     };
@@ -103,6 +105,8 @@ resetButton.addEventListener('click', () => {
 });
 
 downloadButton.addEventListener('click', () => {
+  // Garantir que a moldura esteja no topo antes do download
+  if (frame) layer.moveToTop(frame);
   const dataURL = stage.toDataURL();
   const a = document.createElement('a');
   a.href = dataURL;
