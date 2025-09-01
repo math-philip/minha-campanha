@@ -4,7 +4,7 @@ const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
 const sizeSlider = document.getElementById('size-slider');
 
-let stage, photoLayer, frameLayer, photo, frame, transformer;
+let stage, photoLayer, frameLayer, photo, frame, transformer, maskLayer;
 let lastDistance = 0;
 
 const initCanvas = () => {
@@ -16,13 +16,30 @@ const initCanvas = () => {
     height: containerSize
   });
 
+  // Layer da foto
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
+  // Layer da máscara circular
+  maskLayer = new Konva.Layer();
+  const circleMask = new Konva.Circle({
+    x: stage.width() / 2,
+    y: stage.height() / 2,
+    radius: stage.width() / 2,
+    fill: 'white',
+    listening: false
+  });
+  maskLayer.add(circleMask);
+  maskLayer.clipFunc((ctx) => {
+    ctx.beginPath();
+    ctx.arc(stage.width() / 2, stage.height() / 2, stage.width() / 2, 0, Math.PI * 2, false);
+  });
+  stage.add(maskLayer);
+
+  // Layer da moldura
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
-  // Moldura
   const frameImage = new Image();
   frameImage.src = 'moldura.png';
   frameImage.onload = () => {
@@ -75,7 +92,7 @@ chooseFileBtn.addEventListener('click', () => {
   fileInput.click();
 });
 
-// Upload da foto com fit to canvas e animação de entrada
+// Upload da foto com fit cover e animação de entrada
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -86,7 +103,7 @@ fileInput.addEventListener('change', (e) => {
     img.src = reader.result;
     img.onload = () => {
       const containerSize = stage.width();
-      const finalScale = Math.min(containerSize / img.width, containerSize / img.height);
+      const finalScale = Math.max(containerSize / img.width, containerSize / img.height);
       const finalX = (containerSize - img.width * finalScale) / 2;
       const finalY = (containerSize - img.height * finalScale) / 2;
 
@@ -98,10 +115,10 @@ fileInput.addEventListener('change', (e) => {
           width: img.width * finalScale,
           height: img.height * finalScale,
           draggable: true,
-          scaleX: 0.5, // começa menor
+          scaleX: 0.5,
           scaleY: 0.5
         });
-        photoLayer.add(photo);
+        maskLayer.add(photo);
         transformer.nodes([photo]);
       } else {
         photo.image(img);
@@ -115,7 +132,7 @@ fileInput.addEventListener('change', (e) => {
         });
       }
 
-      photoLayer.draw();
+      maskLayer.draw();
 
       // animação de zoom de entrada
       const tween = new Konva.Tween({
@@ -150,7 +167,7 @@ sizeSlider.addEventListener('input', () => {
   photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
   photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
-  photoLayer.draw();
+  maskLayer.draw();
 });
 
 // Pinch-to-zoom celular
@@ -177,7 +194,7 @@ canvasContainer.addEventListener('touchmove', (e) => {
   }
 
   lastDistance = distance;
-  photoLayer.draw();
+  maskLayer.draw();
   if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
 });
 
@@ -185,7 +202,7 @@ canvasContainer.addEventListener('touchend', (e) => {
   if (e.touches.length < 2) lastDistance = 0;
 });
 
-// Download fixo 800x800px
+// Download fixo 800x800px com máscara
 downloadButton.addEventListener('click', () => {
   if (!photo || !frame) return;
 
@@ -194,6 +211,11 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.width = downloadSize;
   mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
+
+  // aplicar máscara circular
+  ctx.beginPath();
+  ctx.arc(downloadSize / 2, downloadSize / 2, downloadSize / 2, 0, Math.PI * 2, false);
+  ctx.clip();
 
   const scaleX = photo.width() * photo.scaleX() / stage.width();
   const scaleY = photo.height() * photo.scaleY() / stage.height();
@@ -208,6 +230,7 @@ downloadButton.addEventListener('click', () => {
     scaleY * downloadSize
   );
 
+  // desenhar moldura
   ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
 
   const dataURL = mergedCanvas.toDataURL('image/png');
@@ -229,7 +252,7 @@ window.addEventListener('resize', () => {
   }
 
   if (photo) {
-    const scale = Math.min(newSize / photo.getImage().width, newSize / photo.getImage().height);
+    const scale = Math.max(newSize / photo.getImage().width, newSize / photo.getImage().height);
     photo.setAttrs({
       x: (newSize - photo.getImage().width * scale) / 2,
       y: (newSize - photo.getImage().height * scale) / 2,
@@ -241,6 +264,7 @@ window.addEventListener('resize', () => {
     if (sizeSlider) sizeSlider.value = 100;
   }
 
+  maskLayer.draw();
   frameLayer.draw();
   photoLayer.draw();
 });
