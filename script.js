@@ -1,4 +1,5 @@
 const canvasContainer = document.getElementById('canvas-container');
+const chooseFileBtn = document.getElementById('choose-file');
 const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
 const sizeSlider = document.getElementById('size-slider');
@@ -15,15 +16,13 @@ const initCanvas = () => {
     height: containerSize
   });
 
-  // Layer da foto
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Layer da moldura
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
-  // Adicionar moldura
+  // Moldura
   const frameImage = new Image();
   frameImage.src = 'moldura.png';
   frameImage.onload = () => {
@@ -40,7 +39,6 @@ const initCanvas = () => {
     frameLayer.draw();
   };
 
-  // Transformer opcional
   transformer = new Konva.Transformer({
     nodes: [],
     rotateEnabled: false,
@@ -70,6 +68,12 @@ const initCanvas = () => {
     if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
   });
 };
+
+// Botão "Escolher arquivo"
+chooseFileBtn.addEventListener('click', () => {
+  fileInput.value = ''; // reset input
+  fileInput.click();
+});
 
 // Upload da foto
 fileInput.addEventListener('change', (e) => {
@@ -105,7 +109,6 @@ fileInput.addEventListener('change', (e) => {
       transformer.nodes([photo]);
       photoLayer.draw();
 
-      // slider
       if (sizeSlider) {
         sizeSlider.value = scale * 100;
         sizeSlider.min = 10;
@@ -114,28 +117,23 @@ fileInput.addEventListener('change', (e) => {
     };
   };
   reader.readAsDataURL(file);
-
-  // resetar input para permitir reupload do mesmo arquivo
-  fileInput.value = '';
 });
 
 // Slider de zoom
-if (sizeSlider) {
-  sizeSlider.addEventListener('input', () => {
-    if (!photo) return;
-    const scale = sizeSlider.value / 100;
-    const centerX = stage.width() / 2;
-    const centerY = stage.height() / 2;
-    const oldScale = photo.scaleX();
-    photo.scaleX(scale);
-    photo.scaleY(scale);
+sizeSlider.addEventListener('input', () => {
+  if (!photo) return;
+  const scale = sizeSlider.value / 100;
+  const centerX = stage.width() / 2;
+  const centerY = stage.height() / 2;
+  const oldScale = photo.scaleX();
+  photo.scaleX(scale);
+  photo.scaleY(scale);
 
-    photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
-    photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
+  photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
+  photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
-    photoLayer.draw();
-  });
-}
+  photoLayer.draw();
+});
 
 // Pinch-to-zoom celular
 canvasContainer.addEventListener('touchmove', (e) => {
