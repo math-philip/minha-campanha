@@ -1,66 +1,66 @@
-/* Corpo do site */
 body {
   font-family: Arial, sans-serif;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  height: 100vh;
   margin: 0;
-  position: relative;
-  overflow: hidden;
+
+  /* Fundo mesh gradient animado */
+  background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
+              radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
+              radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
+  background-size: 200% 200%;
+  animation: meshMove 15s ease-in-out infinite alternate;
 }
 
-/* Canvas */
+@keyframes meshMove {
+  0% {
+    background-position: 0% 0%, 100% 0%, 0% 100%;
+  }
+  100% {
+    background-position: 100% 100%, 0% 100%, 100% 0%;
+  }
+}
+
+.container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+
 #canvas-container {
-  width: 90%;
-  max-width: 800px;
-  aspect-ratio: 1 / 1;
+  position: relative;
+  width: 90%; /* usa 90% da largura da tela */
+  max-width: 800px; /* máximo 800px */
+  aspect-ratio: 1 / 1; /* força quadrado mesmo em telas diferentes */
   margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
   overflow: hidden;
-  background-color: transparent; /* permite ver o gradiente atrás */
   box-sizing: border-box;
 }
 
-/* Slider */
-#size-slider {
-  width: 90%;
-  max-width: 800px;
-  margin: 10px auto;
-  display: block;
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
-/* Botões */
-button {
-  margin: 10px;
+.controls button {
   padding: 10px 20px;
-  font-size: 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
 }
 
-/* Input file oculto */
-input[type="file"] {
-  display: none;
-}
-
-/* Gradiente animado do fundo do site */
-#site-background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(270deg, #1e6dec, #0030b5, #1e6dec);
-  background-size: 600% 600%;
-  animation: gradientMove 15s ease infinite;
-  z-index: -9999; /* garante que fique atrás de todo conteúdo */
-}
-
-/* Animação do gradiente */
-@keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
