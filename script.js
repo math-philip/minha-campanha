@@ -76,13 +76,19 @@ fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
+  // remover foto antiga
+  if (photo) {
+    photoLayer.remove(photo);
+    transformer.nodes([]);
+    photo = null;
+    photoLayer.draw();
+  }
+
   const reader = new FileReader();
   reader.onload = () => {
     const img = new Image();
     img.src = reader.result;
     img.onload = () => {
-      if (photo) photoLayer.remove(photo);
-
       const containerSize = stage.width();
       const scale = Math.min(containerSize / img.width, containerSize / img.height);
 
@@ -99,7 +105,7 @@ fileInput.addEventListener('change', (e) => {
       transformer.nodes([photo]);
       photoLayer.draw();
 
-      // Slider
+      // slider
       if (sizeSlider) {
         sizeSlider.value = scale * 100;
         sizeSlider.min = 10;
@@ -108,6 +114,9 @@ fileInput.addEventListener('change', (e) => {
     };
   };
   reader.readAsDataURL(file);
+
+  // resetar input para permitir reupload do mesmo arquivo
+  fileInput.value = '';
 });
 
 // Slider de zoom
@@ -170,10 +179,8 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
 
-  // Escala proporcional da foto
   const scaleX = photo.width() * photo.scaleX() / stage.width();
   const scaleY = photo.height() * photo.scaleY() / stage.height();
-
   const posX = photo.x() / stage.width() * downloadSize;
   const posY = photo.y() / stage.height() * downloadSize;
 
@@ -185,7 +192,6 @@ downloadButton.addEventListener('click', () => {
     scaleY * downloadSize
   );
 
-  // Moldura
   ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
 
   const dataURL = mergedCanvas.toDataURL('image/png');
