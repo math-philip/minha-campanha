@@ -1,91 +1,51 @@
-* {
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9fafb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
   margin: 0;
-  padding: 0;
+}
+
+.container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+#canvas-container {
+  position: relative;
+  width: 90%; /* usa 90% da largura da tela */
+  max-width: 800px; /* máximo 800px */
+  aspect-ratio: 1 / 1; /* força quadrado mesmo em telas diferentes */
+  margin: 20px auto;
+  border: 2px dashed #ddd;
+  border-radius: 10px;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
-body, html {
-  width: 100%;
-  height: 100%;
-  font-family: Arial, sans-serif;
-  overflow: hidden;
-}
-
-/* Fundo com mesh gradient animado */
-.background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
-              radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
-              radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
-  animation: moveGradient 15s ease-in-out infinite alternate;
-  z-index: -1;
-}
-
-@keyframes moveGradient {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-25%, -25%) scale(1.2);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}
-
-.editor-container {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  color: white;
-  padding: 20px;
-}
-
-.canvas-container {
-  position: relative;
-  display: inline-block;
-  width: 90vw;
-  max-width: 800px;
-  aspect-ratio: 1 / 1;
-}
-
-canvas {
-  width: 100%;
-  height: 100%;
-  border: 2px solid #fff;
-  border-radius: 10px;
-  background: #000;
-  display: block;
-}
-
-#overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* deixa clicável o que está atrás */
-}
-
 .controls {
-  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
-button {
-  margin-left: 10px;
-  padding: 8px 15px;
-  border: none;
-  background: #1e6dec;
+.controls button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
   color: white;
-  font-size: 16px;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
-  border-radius: 8px;
 }
 
-button:hover {
-  background: #0030b5;
+.controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
