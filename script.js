@@ -88,6 +88,7 @@ const initCanvas = () => {
   });
 };
 
+// Aciona input escondido
 chooseFileBtn.addEventListener('click', () => {
   fileInput.value = '';
   fileInput.click();
@@ -97,8 +98,9 @@ fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // Mostrar botão download
+  // Mostrar botão download e realinhar controles
   downloadButton.style.display = 'inline-block';
+  document.querySelector('.controls').style.justifyContent = 'center';
 
   const reader = new FileReader();
   reader.onload = () => {
