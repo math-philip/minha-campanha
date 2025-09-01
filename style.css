@@ -1,18 +1,18 @@
-/* Import Montserrat */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap');
-
+/* Fonte Montserrat */
 body {
   font-family: 'Montserrat', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 100vh;
+  justify-content: flex-start;
   margin: 0;
+  min-height: 100vh;
+  padding: 20px;
 
-  /* Fundo mesh gradient animado */
-  background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 60%),
-              radial-gradient(circle at 80% 70%, #0030b5, #1e6dec 60%),
-              radial-gradient(circle at 50% 50%, #1e6dec, #0030b5 60%);
+  /* Fundo gradiente azul animado */
+  background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 80%),
+              radial-gradient(circle at 80% 70%, #0030b5, #1e6dec 80%),
+              radial-gradient(circle at 50% 50%, #1e6dec, #0030b5 80%);
   background-size: 200% 200%;
   animation: meshMove 15s ease-in-out infinite alternate;
 }
@@ -31,27 +31,26 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 20px auto;
-  text-align: center;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
-  font-size: 2rem;
-  color: #0030b5;
+  font-size: 1.8rem;
   margin: 0 0 10px 0;
+  color: #0030b5; /* título azul */
 }
 
 .title-container p {
   font-weight: 500; /* Montserrat Medium */
   font-style: italic;
   font-size: 1rem;
-  color: black;
   margin: 0;
+  color: black; /* subtítulo preto */
 }
 
 /* Container do editor */
@@ -59,19 +58,16 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  max-width: 600px;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 20px auto;
-  text-align: center;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
 }
 
 /* Canvas */
 #canvas-container {
   position: relative;
   width: 100%;
-  max-width: 500px;
   aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
@@ -85,29 +81,29 @@ body {
   display: flex;
   justify-content: center;
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 .controls button {
   padding: 10px 20px;
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  color: white;
-  font-weight: 700;
   font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
 }
 
+/* Cores dos botões */
 #choose-file {
-  background-color: #0eb287;
+  background-color: #0eb287; /* verde */
 }
 
 #download {
-  background-color: #1e6dec;
+  background-color: #1e6dec; /* azul */
+  display: none; /* só aparece depois que a pessoa escolher a foto */
 }
 
-/* Desabilitado */
-.controls button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+/* Input file escondido */
+#file-input {
+  display: none;
 }
