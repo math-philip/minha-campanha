@@ -3,7 +3,7 @@ const chooseFileBtn = document.getElementById('choose-file');
 const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
 
-let stage, photoLayer, frameLayer, overlayLayer;
+let stage, sampleLayer, photoLayer, frameLayer, overlayLayer;
 let photo, frame, overlayImg, sampleImg, transformer;
 let lastDistance = 0;
 
@@ -16,11 +16,10 @@ const initCanvas = () => {
     height: containerSize
   });
 
-  // Layer da foto
-  photoLayer = new Konva.Layer();
-  stage.add(photoLayer);
+  // Layer do sample (fundo)
+  sampleLayer = new Konva.Layer();
+  stage.add(sampleLayer);
 
-  // Sample.png como imagem inicial
   const sample = new Image();
   sample.src = 'sample.png';
   sample.onload = () => {
@@ -30,13 +29,16 @@ const initCanvas = () => {
       image: sample,
       width: stage.width(),
       height: stage.height(),
-      listening: false // não interativa
+      listening: false
     });
-    photoLayer.add(sampleImg);
-    photoLayer.draw();
+    sampleLayer.add(sampleImg);
+    sampleLayer.draw();
   };
 
-  // Transformer para futuras fotos
+  // Layer da foto do usuário
+  photoLayer = new Konva.Layer();
+  stage.add(photoLayer);
+
   transformer = new Konva.Transformer({
     nodes: [],
     rotateEnabled: false,
@@ -105,7 +107,7 @@ const initCanvas = () => {
   });
 };
 
-// Botão Escolher arquivo
+// Escolher arquivo
 chooseFileBtn.addEventListener('click', () => {
   fileInput.value = '';
   fileInput.click();
@@ -124,17 +126,18 @@ fileInput.addEventListener('change', (e) => {
       const containerSize = stage.width();
       const scaleX = containerSize / img.width;
       const scaleY = containerSize / img.height;
-      const finalScale = Math.max(scaleX, scaleY); // fit-cover
+      const finalScale = Math.max(scaleX, scaleY);
 
       const finalWidth = img.width * finalScale;
       const finalHeight = img.height * finalScale;
       const finalX = (containerSize - finalWidth) / 2;
       const finalY = (containerSize - finalHeight) / 2;
 
-      // Remove sampleImg se existir
+      // Remove sample
       if (sampleImg) {
         sampleImg.destroy();
         sampleImg = null;
+        sampleLayer.draw();
       }
 
       if (!photo) {
@@ -162,7 +165,7 @@ fileInput.addEventListener('change', (e) => {
         });
       }
 
-      // Animação suave do fit
+      // Animação do fit
       const tween = new Konva.Tween({
         node: photo,
         duration: 0.5,
@@ -176,7 +179,6 @@ fileInput.addEventListener('change', (e) => {
       frameLayer.draw();
       photoLayer.draw();
 
-      // Atualiza botões
       chooseFileBtn.textContent = 'Escolher outra foto';
       downloadButton.style.display = 'inline-block';
     };
@@ -261,7 +263,7 @@ window.addEventListener('resize', () => {
 
   if (overlayImg) {
     overlayImg.width(newSize);
-    overlayImg.height = newSize;
+    overlayImg.height(newSize);
     overlayLayer.draw();
   }
 
@@ -280,7 +282,7 @@ window.addEventListener('resize', () => {
   if (sampleImg) {
     sampleImg.width(newSize);
     sampleImg.height(newSize);
-    photoLayer.draw();
+    sampleLayer.draw();
   }
 
   overlayLayer.moveToTop();
