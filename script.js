@@ -6,12 +6,13 @@ const resetButton = document.getElementById('reset');
 const downloadButton = document.getElementById('download');
 
 let stage, photoLayer, frameLayer, photo, frame;
+const canvasSize = 800; // quadrado fixo
 
 const initCanvas = () => {
   stage = new Konva.Stage({
     container: 'canvas-container',
-    width: canvasContainer.offsetWidth,
-    height: canvasContainer.offsetHeight
+    width: canvasSize,
+    height: canvasSize
   });
 
   // Layer da foto
@@ -30,10 +31,10 @@ const initCanvas = () => {
       x: 0,
       y: 0,
       image: frameImage,
-      width: stage.width(),
-      height: stage.height(),
+      width: canvasSize,
+      height: canvasSize,
       draggable: false,
-      listening: false // importante: não captura eventos, permite interagir com a foto
+      listening: false // não captura eventos
     });
     frameLayer.add(frame);
     frameLayer.draw();
@@ -66,12 +67,15 @@ fileInput.addEventListener('change', (e) => {
     img.onload = () => {
       if (photo) photoLayer.remove(photo);
 
+      // Calcular escala para caber dentro do quadrado mantendo proporção
+      const scale = Math.min(canvasSize / img.width, canvasSize / img.height);
+
       photo = new Konva.Image({
-        x: (stage.width() - img.width / 2) / 2,
-        y: (stage.height() - img.height / 2) / 2,
+        x: (canvasSize - img.width * scale) / 2,
+        y: (canvasSize - img.height * scale) / 2,
         image: img,
-        width: img.width / 2,
-        height: img.height / 2,
+        width: img.width * scale,
+        height: img.height * scale,
         draggable: true
       });
 
@@ -99,20 +103,20 @@ zoomOutButton.addEventListener('click', () => {
 
 resetButton.addEventListener('click', () => {
   if (!photo) return;
+  const scale = Math.min(canvasSize / photo.getImage().width, canvasSize / photo.getImage().height);
   photo.setAttrs({
-    x: (stage.width() - photo.width()) / 2,
-    y: (stage.height() - photo.height()) / 2,
-    scaleX: 1,
-    scaleY: 1
+    x: (canvasSize - photo.getImage().width * scale) / 2,
+    y: (canvasSize - photo.getImage().height * scale) / 2,
+    scaleX: scale,
+    scaleY: scale
   });
   photoLayer.draw();
 });
 
 downloadButton.addEventListener('click', () => {
-  // Merge layers em um canvas temporário para exportar
   const mergedCanvas = document.createElement('canvas');
-  mergedCanvas.width = stage.width();
-  mergedCanvas.height = stage.height();
+  mergedCanvas.width = canvasSize;
+  mergedCanvas.height = canvasSize;
   const ctx = mergedCanvas.getContext('2d');
 
   // Desenhar foto primeiro
