@@ -6,17 +6,14 @@ const resetButton = document.getElementById('reset');
 const downloadButton = document.getElementById('download');
 
 let stage, photoLayer, frameLayer, photo, frame;
-const canvasSize = 800; // tamanho quadrado fixo
 
 const initCanvas = () => {
-  // Garantir que o container seja quadrado
-  canvasContainer.style.width = canvasSize + 'px';
-  canvasContainer.style.height = canvasSize + 'px';
+  const containerSize = canvasContainer.offsetWidth;
 
   stage = new Konva.Stage({
     container: 'canvas-container',
-    width: canvasContainer.offsetWidth,
-    height: canvasContainer.offsetWidth // manter quadrado
+    width: containerSize,
+    height: containerSize
   });
 
   // Layer da foto
@@ -35,10 +32,10 @@ const initCanvas = () => {
       x: 0,
       y: 0,
       image: frameImage,
-      width: canvasSize,
-      height: canvasSize,
+      width: stage.width(),
+      height: stage.height(),
       draggable: false,
-      listening: false // não captura eventos
+      listening: false
     });
     frameLayer.add(frame);
     frameLayer.draw();
@@ -71,12 +68,12 @@ fileInput.addEventListener('change', (e) => {
     img.onload = () => {
       if (photo) photoLayer.remove(photo);
 
-      // Calcular escala para caber dentro do quadrado mantendo proporção
-      const scale = Math.min(stage.width() / img.width, stage.height() / img.height);
+      const containerSize = stage.width();
+      const scale = Math.min(containerSize / img.width, containerSize / img.height);
 
       photo = new Konva.Image({
-        x: (stage.width() - img.width * scale) / 2,
-        y: (stage.height() - img.height * scale) / 2,
+        x: (containerSize - img.width * scale) / 2,
+        y: (containerSize - img.height * scale) / 2,
         image: img,
         width: img.width * scale,
         height: img.height * scale,
@@ -107,25 +104,28 @@ zoomOutButton.addEventListener('click', () => {
 
 resetButton.addEventListener('click', () => {
   if (!photo) return;
-  const scale = Math.min(stage.width() / photo.getImage().width, stage.height() / photo.getImage().height);
+  const containerSize = stage.width();
+  const scale = Math.min(containerSize / photo.getImage().width, containerSize / photo.getImage().height);
   photo.setAttrs({
-    x: (stage.width() - photo.getImage().width * scale) / 2,
-    y: (stage.height() - photo.getImage().height * scale) / 2,
+    x: (containerSize - photo.getImage().width * scale) / 2,
+    y: (containerSize - photo.getImage().height * scale) / 2,
     scaleX: scale,
     scaleY: scale
   });
   photoLayer.draw();
 });
 
+// Download com merge das camadas
 downloadButton.addEventListener('click', () => {
+  const containerSize = stage.width();
   const mergedCanvas = document.createElement('canvas');
-  mergedCanvas.width = canvasSize;
-  mergedCanvas.height = canvasSize;
+  mergedCanvas.width = containerSize;
+  mergedCanvas.height = containerSize;
   const ctx = mergedCanvas.getContext('2d');
 
-  // Desenhar foto primeiro
+  // Desenhar foto
   ctx.drawImage(photo.getImage(), photo.x(), photo.y(), photo.width() * photo.scaleX(), photo.height() * photo.scaleY());
-  // Desenhar moldura por cima
+  // Desenhar moldura
   ctx.drawImage(frame.getImage(), frame.x(), frame.y(), frame.width() * frame.scaleX(), frame.height() * frame.scaleY());
 
   const dataURL = mergedCanvas.toDataURL('image/png');
@@ -133,6 +133,31 @@ downloadButton.addEventListener('click', () => {
   a.href = dataURL;
   a.download = 'foto_com_moldura.png';
   a.click();
+});
+
+// Redimensionamento responsivo
+window.addEventListener('resize', () => {
+  const newSize = canvasContainer.offsetWidth;
+  stage.width(newSize);
+  stage.height(newSize);
+
+  if (frame) {
+    frame.width(newSize);
+    frame.height(newSize);
+  }
+
+  if (photo) {
+    const scale = Math.min(newSize / photo.getImage().width, newSize / photo.getImage().height);
+    photo.setAttrs({
+      x: (newSize - photo.getImage().width * scale) / 2,
+      y: (newSize - photo.getImage().height * scale) / 2,
+      scaleX: scale,
+      scaleY: scale
+    });
+  }
+
+  frameLayer.draw();
+  photoLayer.draw();
 });
 
 initCanvas();
