@@ -36,12 +36,15 @@ body {
   max-width: 600px;
   text-align: center;
   margin-bottom: 20px;
+  color: #0030b5;
 }
 
 .title-container h1 {
+  font-family: 'Montserrat', sans-serif;
   font-weight: 900; /* Montserrat Black */
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   margin: 0 0 10px 0;
+  color: #0030b5; /* cor do título */
 }
 
 .title-container p {
