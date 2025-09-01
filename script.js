@@ -1,114 +1,282 @@
-const canvas = document.getElementById("editorCanvas");
-const ctx = canvas.getContext("2d");
-const fileInput = document.getElementById("fileInput");
-const downloadBtn = document.getElementById("downloadBtn");
-const zoomSlider = document.getElementById("zoomSlider");
+const canvasContainer = document.getElementById('canvas-container');
+const chooseFileBtn = document.getElementById('choose-file');
+const fileInput = document.getElementById('file-input');
+const downloadButton = document.getElementById('download');
+const sizeSlider = document.getElementById('size-slider');
 
-let img = new Image();
-let frame = new Image();
-frame.src = "moldura.png";
+let stage, photoLayer, frameLayer, overlayLayer;
+let photo, frame, overlayImg, transformer;
+let lastDistance = 0;
 
-let imgX = 0, imgY = 0, imgScale = 1;
-let isDragging = false, startX, startY;
+const initCanvas = () => {
+  const containerSize = canvasContainer.offsetWidth;
 
-fileInput.addEventListener("change", (e) => {
+  stage = new Konva.Stage({
+    container: 'canvas-container',
+    width: containerSize,
+    height: containerSize
+  });
+
+  // Layer da foto
+  photoLayer = new Konva.Layer();
+  stage.add(photoLayer);
+
+  // Transformer
+  transformer = new Konva.Transformer({
+    nodes: [],
+    rotateEnabled: false,
+    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
+  });
+  photoLayer.add(transformer);
+
+  // Layer da moldura
+  frameLayer = new Konva.Layer();
+  stage.add(frameLayer);
+
+  const frameImage = new Image();
+  frameImage.src = 'moldura.png';
+  frameImage.onload = () => {
+    frame = new Konva.Image({
+      x: 0,
+      y: 0,
+      image: frameImage,
+      width: stage.width(),
+      height: stage.height(),
+      draggable: false,
+      listening: false
+    });
+    frameLayer.add(frame);
+    frameLayer.draw();
+  };
+
+  // Layer do overlay estático de referência
+  overlayLayer = new Konva.Layer();
+  stage.add(overlayLayer);
+
+  const overlayStatic = new Image();
+  overlayStatic.src = 'overlay.png';
+  overlayStatic.onload = () => {
+    overlayImg = new Konva.Image({
+      x: 0,
+      y: 0,
+      image: overlayStatic,
+      width: stage.width(),
+      height: stage.height(),
+      listening: false // não interfere na interação
+    });
+    overlayLayer.add(overlayImg);
+    overlayLayer.draw();
+  };
+
+  // Scroll para zoom desktop
+  stage.on('wheel', (e) => {
+    if (!photo) return;
+    e.evt.preventDefault();
+    const oldScale = photo.scaleX();
+    const pointer = stage.getPointerPosition();
+    const scaleBy = 1.05;
+    const direction = e.evt.deltaY > 0 ? 1 / scaleBy : scaleBy;
+    photo.scaleX(photo.scaleX() * direction);
+    photo.scaleY(photo.scaleY() * direction);
+
+    const mousePointTo = {
+      x: (pointer.x - photo.x()) / oldScale,
+      y: (pointer.y - photo.y()) / oldScale
+    };
+    photo.x(pointer.x - mousePointTo.x * photo.scaleX());
+    photo.y(pointer.y - mousePointTo.y * photo.scaleY());
+
+    photoLayer.draw();
+  });
+};
+
+// Botão "Escolher arquivo"
+chooseFileBtn.addEventListener('click', () => {
+  fileInput.value = '';
+  fileInput.click();
+});
+
+// Upload da foto com fit cover + animação
+fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
   const reader = new FileReader();
-  reader.onload = (event) => {
-    img = new Image();
-    img.onload = () => fitImageToCanvas();
-    img.src = event.target.result;
+  reader.onload = () => {
+    const img = new Image();
+    img.src = reader.result;
+    img.onload = () => {
+      const containerSize = stage.width();
+      const scaleX = containerSize / img.width;
+      const scaleY = containerSize / img.height;
+      const finalScale = Math.max(scaleX, scaleY); // fit-cover
+
+      const finalWidth = img.width * finalScale;
+      const finalHeight = img.height * finalScale;
+      const finalX = (containerSize - finalWidth) / 2;
+      const finalY = (containerSize - finalHeight) / 2;
+
+      if (!photo) {
+        photo = new Konva.Image({
+          x: finalX,
+          y: finalY,
+          image: img,
+          width: finalWidth,
+          height: finalHeight,
+          draggable: true,
+          scaleX: 0, // inicia animação
+          scaleY: 0
+        });
+        photoLayer.add(photo);
+        transformer.nodes([photo]);
+      } else {
+        photo.image(img);
+        photo.setAttrs({
+          x: finalX,
+          y: finalY,
+          width: finalWidth,
+          height: finalHeight,
+          scaleX: 0,
+          scaleY: 0
+        });
+      }
+
+      // animação suave do fit
+      const tween = new Konva.Tween({
+        node: photo,
+        duration: 0.5,
+        scaleX: 1,
+        scaleY: 1,
+        easing: Konva.Easings.EaseInOut
+      });
+      tween.play();
+
+      overlayLayer.moveToTop(); // garante overlay acima
+      frameLayer.draw();
+      photoLayer.draw();
+
+      if (sizeSlider) {
+        sizeSlider.value = 100;
+        sizeSlider.min = 10;
+        sizeSlider.max = 300;
+      }
+    };
   };
   reader.readAsDataURL(file);
 });
 
-function fitImageToCanvas() {
-  const scaleX = canvas.width / img.width;
-  const scaleY = canvas.height / img.height;
-  imgScale = Math.max(scaleX, scaleY);
+// Slider de zoom
+sizeSlider.addEventListener('input', () => {
+  if (!photo) return;
+  const scale = sizeSlider.value / 100;
+  const centerX = stage.width() / 2;
+  const centerY = stage.height() / 2;
+  const oldScale = photo.scaleX();
+  photo.scaleX(scale);
+  photo.scaleY(scale);
 
-  imgX = (canvas.width - img.width * imgScale) / 2;
-  imgY = (canvas.height - img.height * imgScale) / 2;
+  photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
+  photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
-  zoomSlider.value = imgScale.toFixed(2);
-  draw();
-}
-
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  if (img.src) ctx.drawImage(img, imgX, imgY, img.width * imgScale, img.height * imgScale);
-  if (frame.complete) ctx.drawImage(frame, 0, 0, canvas.width, canvas.height);
-}
-
-// Drag
-canvas.addEventListener("mousedown", (e) => {
-  isDragging = true;
-  startX = e.offsetX - imgX;
-  startY = e.offsetY - imgY;
-});
-canvas.addEventListener("mousemove", (e) => {
-  if (!isDragging) return;
-  imgX = e.offsetX - startX;
-  imgY = e.offsetY - startY;
-  draw();
-});
-canvas.addEventListener("mouseup", () => isDragging = false);
-canvas.addEventListener("mouseleave", () => isDragging = false);
-
-// Touch
-canvas.addEventListener("touchstart", (e) => {
-  if (e.touches.length === 1) {
-    isDragging = true;
-    const rect = canvas.getBoundingClientRect();
-    startX = e.touches[0].clientX - rect.left - imgX;
-    startY = e.touches[0].clientY - rect.top - imgY;
-  }
-}, { passive: false });
-
-canvas.addEventListener("touchmove", (e) => {
-  if (!isDragging || e.touches.length !== 1) return;
-  const rect = canvas.getBoundingClientRect();
-  imgX = e.touches[0].clientX - rect.left - startX;
-  imgY = e.touches[0].clientY - rect.top - startY;
-  draw();
-}, { passive: false });
-
-canvas.addEventListener("touchend", () => isDragging = false);
-
-// Zoom com slider
-zoomSlider.addEventListener("input", () => {
-  imgScale = parseFloat(zoomSlider.value);
-  draw();
+  photoLayer.draw();
 });
 
-// Zoom com scroll
-canvas.addEventListener("wheel", (e) => {
+// Pinch-to-zoom celular
+canvasContainer.addEventListener('touchmove', (e) => {
+  if (!photo || e.touches.length !== 2) return;
   e.preventDefault();
-  imgScale += e.deltaY * -0.001;
-  imgScale = Math.min(Math.max(0.5, imgScale), 3);
-  zoomSlider.value = imgScale.toFixed(2);
-  draw();
+
+  const touch1 = e.touches[0];
+  const touch2 = e.touches[1];
+  const dx = touch2.clientX - touch1.clientX;
+  const dy = touch2.clientY - touch1.clientY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (lastDistance) {
+    const scaleChange = distance / lastDistance;
+    photo.scaleX(photo.scaleX() * scaleChange);
+    photo.scaleY(photo.scaleY() * scaleChange);
+
+    const centerX = (touch1.clientX + touch2.clientX) / 2 - canvasContainer.getBoundingClientRect().left;
+    const centerY = (touch1.clientY + touch2.clientY) / 2 - canvasContainer.getBoundingClientRect().top;
+    const oldScale = photo.scaleX() / scaleChange;
+    photo.x(centerX - (centerX - photo.x()) * (photo.scaleX() / oldScale));
+    photo.y(centerY - (centerY - photo.y()) * (photo.scaleY() / oldScale));
+  }
+
+  lastDistance = distance;
+  overlayLayer.moveToTop();
+  photoLayer.draw();
 });
 
-// Download
-downloadBtn.addEventListener("click", () => {
-  const tempCanvas = document.createElement("canvas");
-  tempCanvas.width = 800;
-  tempCanvas.height = 800;
-  const tempCtx = tempCanvas.getContext("2d");
-
-  if (img.src) tempCtx.drawImage(img, imgX, imgY, img.width * imgScale, img.height * imgScale);
-  if (frame.complete) tempCtx.drawImage(frame, 0, 0, tempCanvas.width, tempCanvas.height);
-
-  const link = document.createElement("a");
-  link.download = "moldura.png";
-  link.href = tempCanvas.toDataURL("image/png");
-  link.click();
+canvasContainer.addEventListener('touchend', (e) => {
+  if (e.touches.length < 2) lastDistance = 0;
 });
 
-function animate() {
-  requestAnimationFrame(animate);
-  draw();
-}
-animate();
+// Download fixo 800x800px (sem overlay)
+downloadButton.addEventListener('click', () => {
+  if (!photo || !frame) return;
+
+  const downloadSize = 800;
+  const mergedCanvas = document.createElement('canvas');
+  mergedCanvas.width = downloadSize;
+  mergedCanvas.height = downloadSize;
+  const ctx = mergedCanvas.getContext('2d');
+
+  const scaleX = photo.width() * photo.scaleX() / stage.width();
+  const scaleY = photo.height() * photo.scaleY() / stage.height();
+  const posX = photo.x() / stage.width() * downloadSize;
+  const posY = photo.y() / stage.height() * downloadSize;
+
+  ctx.drawImage(
+    photo.getImage(),
+    posX,
+    posY,
+    scaleX * downloadSize,
+    scaleY * downloadSize
+  );
+
+  ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
+
+  const dataURL = mergedCanvas.toDataURL('image/png');
+  const a = document.createElement('a');
+  a.href = dataURL;
+  a.download = 'foto_com_moldura.png';
+  a.click();
+});
+
+// Redimensionamento responsivo
+window.addEventListener('resize', () => {
+  const newSize = canvasContainer.offsetWidth;
+  stage.width(newSize);
+  stage.height(newSize);
+
+  if (frame) {
+    frame.width(newSize);
+    frame.height(newSize);
+  }
+
+  if (overlayImg) {
+    overlayImg.width(newSize);
+    overlayImg.height(newSize);
+    overlayLayer.draw();
+  }
+
+  if (photo) {
+    const scale = Math.max(newSize / photo.getImage().width, newSize / photo.getImage().height);
+    photo.setAttrs({
+      x: (newSize - photo.getImage().width * scale) / 2,
+      y: (newSize - photo.getImage().height * scale) / 2,
+      scaleX: 1,
+      scaleY: 1,
+      width: photo.getImage().width * scale,
+      height: photo.getImage().height * scale
+    });
+  }
+
+  overlayLayer.moveToTop();
+  frameLayer.draw();
+  photoLayer.draw();
+});
+
+initCanvas();
