@@ -165,22 +165,6 @@ fileInput.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-// Slider de zoom
-sizeSlider.addEventListener('input', () => {
-  if (!photo) return;
-  const scale = sizeSlider.value / 100;
-  const centerX = stage.width() / 2;
-  const centerY = stage.height() / 2;
-  const oldScale = photo.scaleX();
-  photo.scaleX(scale);
-  photo.scaleY(scale);
-
-  photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
-  photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
-
-  photoLayer.draw();
-});
-
 // Pinch-to-zoom celular
 canvasContainer.addEventListener('touchmove', (e) => {
   if (!photo || e.touches.length !== 2) return;
