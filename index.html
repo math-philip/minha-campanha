@@ -1,32 +1,22 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Editor de Fotos com Moldura</title>
-  <script src="https://cdn.jsdelivr.net/npm/konva@8.4.3/konva.min.js"></script>
-  <link rel="stylesheet" href="style.css">
-</head>
 <body>
-  <div class="container">
+  <!-- Container do título -->
+  <div class="title-container">
     <h1>Editor de Fotos com Moldura</h1>
+    <p>Adicione nossa moldura em sua foto de perfil e apoie nossa campanha!</p>
+  </div>
 
+  <!-- Container do editor -->
+  <div class="container">
     <!-- Canvas -->
     <div id="canvas-container"></div>
 
     <!-- Controles -->
     <div class="controls">
-      <!-- Botão customizado -->
       <button id="choose-file">Escolha sua foto</button>
-
-      <!-- Input escondido -->
-      <input type="file" id="file-input" accept="image/*" style="display: none;">
-
-      <!-- Download -->
+      <input type="file" id="file-input" accept="image/*">
       <button id="download">Download</button>
     </div>
   </div>
 
   <script src="script.js"></script>
 </body>
-</html>
