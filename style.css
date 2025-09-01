@@ -1,14 +1,17 @@
-/* Import Montserrat do Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,900;1,500&display=swap');
+/* Importa fonte Montserrat do Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500;0,900&display=swap');
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Montserrat', Arial, sans-serif;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column; /* garante empilhamento vertical */
+  justify-content: flex-start;
+  align-items: center;
   min-height: 100vh;
   margin: 0;
   padding: 20px;
+
+  /* Fundo mesh gradient animado */
   background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
               radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
               radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
@@ -16,7 +19,6 @@ body {
   animation: meshMove 15s ease-in-out infinite alternate;
 }
 
-/* Animação do mesh */
 @keyframes meshMove {
   0% {
     background-position: 0% 0%, 100% 0%, 0% 100%;
@@ -26,34 +28,29 @@ body {
   }
 }
 
-/* Container do título */
+/* Container do título e subtítulo */
 .title-container {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 100%;
   max-width: 600px;
   margin-bottom: 20px;
 }
 
-/* Título */
 .title-container h1 {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 900; /* Black */
-  font-style: normal;
+  font-weight: 900; /* Montserrat Black */
   margin: 0 0 10px 0;
+  font-size: 2rem;
 }
 
-/* Subtítulo */
 .title-container p {
-  font-family: 'Montserrat', sans-serif;
   font-weight: 500; /* Medium */
   font-style: italic;
   margin: 0;
-  font-size: 16px;
-  color: #333;
+  font-size: 1rem;
 }
 
 /* Container do editor */
@@ -61,19 +58,18 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 100%;
   max-width: 600px;
-  box-sizing: border-box;
+  margin-bottom: 20px;
 }
 
-/* Canvas */
 #canvas-container {
   position: relative;
-  width: 100%;
+  width: 70%; /* ocupa 70% da largura */
   max-width: 800px;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 1 / 1; /* mantém quadrado */
   margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
@@ -81,16 +77,13 @@ body {
   box-sizing: border-box;
 }
 
-/* Controles */
 .controls {
   display: flex;
   justify-content: center;
   gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 15px;
+  flex-wrap: wrap; /* garante boa responsividade no celular */
 }
 
-/* Botões */
 .controls button {
   padding: 10px 20px;
   background-color: #4CAF50;
@@ -98,39 +91,9 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  font-style: normal;
-  transition: background 0.3s;
-}
-
-.controls button:hover {
-  background-color: #45a049;
 }
 
 .controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-/* Input file escondido */
-#file-input {
-  display: none;
-}
-
-/* Responsivo */
-@media (max-width: 500px) {
-  body {
-    padding: 10px;
-  }
-
-  .title-container,
-  .container {
-    padding: 15px;
-  }
-
-  .controls button {
-    width: 100%;
-    max-width: 250px;
-  }
 }
