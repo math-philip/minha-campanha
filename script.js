@@ -308,4 +308,5 @@ window.addEventListener('resize', () => {
 // ------------------------------
 // Inicializa canvas
 // ------------------------------
-initCanvas();
+document.addEventListener("DOMContentLoaded", initCanvas);
+
