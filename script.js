@@ -20,14 +20,32 @@ const initCanvas = () => {
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Overlay de pré-visualização
-  overlay = new Konva.Rect({
-    x: 0,
-    y: 0,
-    width: stage.width(),
-    height: stage.height(),
-    fill: 'rgba(0,0,0,0.2)', // cor do overlay
-    listening: false // permite interação com a foto
+  // Overlay circular estilizada
+  overlay = new Konva.Shape({
+    sceneFunc: function(ctx, shape) {
+      const radius = stage.width() / 2;
+      const centerX = stage.width() / 2;
+      const centerY = stage.height() / 2;
+
+      // área escura
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(0, 0, stage.width(), stage.height());
+
+      // círculo transparente central
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+      ctx.fill();
+
+      // borda circular leve
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
+      ctx.stroke();
+    },
+    listening: false
   });
   photoLayer.add(overlay);
   overlay.moveToTop();
