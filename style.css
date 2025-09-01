@@ -20,12 +20,14 @@ body {
 
 #canvas-container {
   position: relative;
-  width: 100%;
-  height: 400px;
-  margin: 20px 0;
+  width: 90%; /* usa 90% da largura da tela */
+  max-width: 800px; /* máximo 800px */
+  aspect-ratio: 1 / 1; /* força quadrado mesmo em telas diferentes */
+  margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .controls {
