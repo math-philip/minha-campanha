@@ -25,10 +25,6 @@
       background-color: #fff;
     }
 
-    input[type="file"] {
-      margin: 10px;
-    }
-
     #size-slider {
       width: 90%;
       max-width: 800px;
@@ -36,11 +32,15 @@
       display: block;
     }
 
-    #download {
+    button {
       margin: 10px;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+    }
+
+    input[type="file"] {
+      display: none;
     }
   </style>
 </head>
@@ -48,18 +48,17 @@
 
   <h1>Editor de Fotos com Moldura</h1>
 
-  <!-- Área de edição -->
+  <!-- Canvas -->
   <div id="canvas-container"></div>
 
-  <!-- Slider de zoom -->
+  <!-- Slider -->
   <input type="range" id="size-slider" value="100" min="10" max="300">
 
-  <!-- Upload e download -->
+  <!-- Botões -->
+  <button id="choose-file">Escolher arquivo</button>
   <input type="file" id="file-input" accept="image/*">
   <button id="download">Download</button>
 
-  <!-- Script do editor -->
   <script src="script.js"></script>
-
 </body>
 </html>
