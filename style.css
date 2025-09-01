@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;1,500;0,900&display=swap');
+/* Importa a fonte Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&display=swap');
 
 body {
-  font-family: 'Montserrat', Arial, sans-serif;
+  font-family: 'Montserrat', sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -10,10 +11,10 @@ body {
   margin: 0;
   padding: 20px;
 
-  /* Fundo mesh gradient animado */
-  background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
-              radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
-              radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
+  /* Fundo mesh gradient animado só com tons de azul */
+  background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 40%),
+              radial-gradient(circle at 80% 70%, #0030b5, #001f80 40%),
+              radial-gradient(circle at 50% 50%, #1e6dec, #002080 40%);
   background-size: 200% 200%;
   animation: meshMove 15s ease-in-out infinite alternate;
 }
@@ -27,7 +28,7 @@ body {
   }
 }
 
-/* Container do título e subtítulo */
+/* Container do título */
 .title-container {
   background-color: white;
   padding: 20px;
@@ -41,15 +42,15 @@ body {
 
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
+  font-size: 2rem;  /* ligeiramente menor */
   margin: 0 0 10px 0;
-  font-size: 1.8rem; /* título um pouco menor */
 }
 
 .title-container p {
-  font-weight: 500; /* Medium */
+  font-weight: 500; /* Montserrat Medium */
   font-style: italic;
-  margin: 0;
   font-size: 1rem;
+  margin: 0;
 }
 
 /* Container do editor */
@@ -61,14 +62,15 @@ body {
   text-align: center;
   width: 100%;
   max-width: 600px;
-  margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
+/* Canvas */
 #canvas-container {
   position: relative;
-  width: 70%; /* ocupa 70% da largura */
+  width: 70%;
   max-width: 800px;
-  aspect-ratio: 1 / 1; /* mantém quadrado */
+  aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
@@ -76,11 +78,12 @@ body {
   box-sizing: border-box;
 }
 
+/* Controles */
 .controls {
   display: flex;
   justify-content: center;
   gap: 10px;
-  flex-wrap: wrap; /* garante boa responsividade no celular */
+  margin-top: 10px;
 }
 
 .controls button {
@@ -95,8 +98,4 @@ body {
 .controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-#file-input {
-  display: none; /* esconde o input nativo */
 }
