@@ -154,9 +154,10 @@ fileInput.addEventListener('change', (e) => {
       frameLayer.draw();
       photoLayer.draw();
 
-      // Mostrar botão download e mudar texto do botão
-      downloadButton.style.display = 'inline-block';
-      chooseFileBtn.textContent = 'Escolher outra foto';
+      // Mostrar botão de download e alterar texto do botão
+downloadButton.style.display = 'inline-block';
+downloadButton.textContent = 'Baixar foto'; // texto atualizado
+chooseFileBtn.textContent = 'Escolher outra foto';
     };
   };
   reader.readAsDataURL(file);
