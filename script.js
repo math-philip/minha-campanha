@@ -1,14 +1,3 @@
-// ------------------------------
-// Fundo animado do site
-// ------------------------------
-const body = document.querySelector('body');
-const bgDiv = document.createElement('div');
-bgDiv.id = 'site-background';
-body.prepend(bgDiv); // insere atrás de todo conteúdo
-
-// ------------------------------
-// Seletores do DOM
-// ------------------------------
 const canvasContainer = document.getElementById('canvas-container');
 const chooseFileBtn = document.getElementById('choose-file');
 const fileInput = document.getElementById('file-input');
@@ -19,9 +8,6 @@ let stage, photoLayer, frameLayer, overlayLayer;
 let photo, frame, overlayImg, transformer;
 let lastDistance = 0;
 
-// ------------------------------
-// Inicializa o canvas
-// ------------------------------
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
 
@@ -76,7 +62,7 @@ const initCanvas = () => {
       image: overlayStatic,
       width: stage.width(),
       height: stage.height(),
-      listening: false
+      listening: false // não interfere na interação
     });
     overlayLayer.add(overlayImg);
     overlayLayer.draw();
@@ -104,17 +90,13 @@ const initCanvas = () => {
   });
 };
 
-// ------------------------------
 // Botão "Escolher arquivo"
-// ------------------------------
 chooseFileBtn.addEventListener('click', () => {
   fileInput.value = '';
   fileInput.click();
 });
 
-// ------------------------------
 // Upload da foto com fit cover + animação
-// ------------------------------
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -142,7 +124,7 @@ fileInput.addEventListener('change', (e) => {
           width: finalWidth,
           height: finalHeight,
           draggable: true,
-          scaleX: 0,
+          scaleX: 0, // inicia animação
           scaleY: 0
         });
         photoLayer.add(photo);
@@ -169,7 +151,7 @@ fileInput.addEventListener('change', (e) => {
       });
       tween.play();
 
-      overlayLayer.moveToTop();
+      overlayLayer.moveToTop(); // garante overlay acima
       frameLayer.draw();
       photoLayer.draw();
 
@@ -183,9 +165,7 @@ fileInput.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-// ------------------------------
 // Slider de zoom
-// ------------------------------
 sizeSlider.addEventListener('input', () => {
   if (!photo) return;
   const scale = sizeSlider.value / 100;
@@ -201,9 +181,7 @@ sizeSlider.addEventListener('input', () => {
   photoLayer.draw();
 });
 
-// ------------------------------
 // Pinch-to-zoom celular
-// ------------------------------
 canvasContainer.addEventListener('touchmove', (e) => {
   if (!photo || e.touches.length !== 2) return;
   e.preventDefault();
@@ -235,9 +213,7 @@ canvasContainer.addEventListener('touchend', (e) => {
   if (e.touches.length < 2) lastDistance = 0;
 });
 
-// ------------------------------
 // Download fixo 800x800px (sem overlay)
-// ------------------------------
 downloadButton.addEventListener('click', () => {
   if (!photo || !frame) return;
 
@@ -269,9 +245,7 @@ downloadButton.addEventListener('click', () => {
   a.click();
 });
 
-// ------------------------------
 // Redimensionamento responsivo
-// ------------------------------
 window.addEventListener('resize', () => {
   const newSize = canvasContainer.offsetWidth;
   stage.width(newSize);
@@ -305,8 +279,4 @@ window.addEventListener('resize', () => {
   photoLayer.draw();
 });
 
-// ------------------------------
-// Inicializa canvas
-// ------------------------------
-document.addEventListener("DOMContentLoaded", initCanvas);
-
+initCanvas();
