@@ -6,7 +6,7 @@ body {
   align-items: center;
   min-height: 100vh;
   margin: 0;
-  padding: 20px; /* garante espaço lateral */
+  padding: 20px; /* espaço lateral */
   
   /* Fundo mesh gradient animado */
   background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
@@ -34,7 +34,7 @@ body {
   text-align: center;
   width: 100%;
   max-width: 500px;
-  margin: 20px auto; /* espaço acima e abaixo */
+  margin: 20px auto;
   box-sizing: border-box;
 }
 
@@ -60,8 +60,8 @@ body {
 /* ===== Canvas ===== */
 #canvas-container {
   position: relative;
-  width: 100%;        /* ocupa 100% do container */
-  aspect-ratio: 1 / 1; /* mantém quadrado */
+  width: 100%;
+  aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
@@ -88,6 +88,11 @@ body {
 .controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* ===== Input file escondido ===== */
+#file-input {
+  display: none; /* esconde completamente o input */
 }
 
 /* ===== Responsividade ===== */
