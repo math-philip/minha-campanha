@@ -1,13 +1,13 @@
-/* ===== Corpo do site ===== */
 body {
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
   margin: 0;
-  padding: 20px; /* espaço lateral */
-  
+  padding: 20px;
+
   /* Fundo mesh gradient animado */
   background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
               radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
@@ -25,42 +25,31 @@ body {
   }
 }
 
-/* ===== Container do título ===== */
 .title-container {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
   width: 100%;
-  max-width: 500px;
-  margin: 20px auto;
-  box-sizing: border-box;
-}
-
-.title-container p {
-  margin-top: 10px;
-  font-size: 16px;
-  color: #333;
-}
-
-/* ===== Container do editor ===== */
-.container {
-  background-color: rgba(255, 255, 255, 0.95);
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  text-align: center;
-  width: 100%;
-  max-width: 500px;
-  box-sizing: border-box;
+  max-width: 600px;
   margin-bottom: 20px;
 }
 
-/* ===== Canvas ===== */
+.container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+
 #canvas-container {
   position: relative;
-  width: 100%;
+  width: 90%;
+  max-width: 800px;
   aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
@@ -69,11 +58,11 @@ body {
   box-sizing: border-box;
 }
 
-/* ===== Controles ===== */
 .controls {
   display: flex;
   justify-content: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .controls button {
@@ -85,25 +74,12 @@ body {
   cursor: pointer;
 }
 
+/* Botão download inicialmente escondido */
+#download {
+  display: none;
+}
+
 .controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-/* ===== Input file escondido ===== */
-#file-input {
-  display: none; /* esconde completamente o input */
-}
-
-/* ===== Responsividade ===== */
-@media (max-width: 400px) {
-  .title-container,
-  .container {
-    max-width: 350px;
-    padding: 15px;
-  }
-
-  .title-container p {
-    font-size: 14px;
-  }
 }
