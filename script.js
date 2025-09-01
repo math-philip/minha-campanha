@@ -62,7 +62,7 @@ const initCanvas = () => {
       image: overlayStatic,
       width: stage.width(),
       height: stage.height(),
-      listening: false // não interfere no clique
+      listening: false // não interfere na interação
     });
     overlayLayer.add(overlayImg);
     overlayLayer.draw();
@@ -96,7 +96,7 @@ chooseFileBtn.addEventListener('click', () => {
   fileInput.click();
 });
 
-// Upload da foto com fit cover
+// Upload da foto com fit cover + animação
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -107,20 +107,25 @@ fileInput.addEventListener('change', (e) => {
     img.src = reader.result;
     img.onload = () => {
       const containerSize = stage.width();
-      const finalScale = Math.max(containerSize / img.width, containerSize / img.height);
-      const finalX = (containerSize - img.width * finalScale) / 2;
-      const finalY = (containerSize - img.height * finalScale) / 2;
+      const scaleX = containerSize / img.width;
+      const scaleY = containerSize / img.height;
+      const finalScale = Math.max(scaleX, scaleY); // fit-cover
+
+      const finalWidth = img.width * finalScale;
+      const finalHeight = img.height * finalScale;
+      const finalX = (containerSize - finalWidth) / 2;
+      const finalY = (containerSize - finalHeight) / 2;
 
       if (!photo) {
         photo = new Konva.Image({
           x: finalX,
           y: finalY,
           image: img,
-          width: img.width * finalScale,
-          height: img.height * finalScale,
+          width: finalWidth,
+          height: finalHeight,
           draggable: true,
-          scaleX: 0.5,
-          scaleY: 0.5
+          scaleX: 0, // inicia animação
+          scaleY: 0
         });
         photoLayer.add(photo);
         transformer.nodes([photo]);
@@ -129,16 +134,32 @@ fileInput.addEventListener('change', (e) => {
         photo.setAttrs({
           x: finalX,
           y: finalY,
-          width: img.width * finalScale,
-          height: img.height * finalScale,
-          scaleX: 0.5,
-          scaleY: 0.5
+          width: finalWidth,
+          height: finalHeight,
+          scaleX: 0,
+          scaleY: 0
         });
       }
 
-      overlayLayer.moveToTop(); // garante que o overlay fique acima
+      // animação suave do fit
+      const tween = new Konva.Tween({
+        node: photo,
+        duration: 0.5,
+        scaleX: 1,
+        scaleY: 1,
+        easing: Konva.Easings.EaseInOut
+      });
+      tween.play();
+
+      overlayLayer.moveToTop(); // garante overlay acima
       frameLayer.draw();
       photoLayer.draw();
+
+      if (sizeSlider) {
+        sizeSlider.value = 100;
+        sizeSlider.min = 10;
+        sizeSlider.max = 300;
+      }
     };
   };
   reader.readAsDataURL(file);
@@ -184,8 +205,12 @@ canvasContainer.addEventListener('touchmove', (e) => {
   }
 
   lastDistance = distance;
-  overlayLayer.moveToTop(); // sempre acima
+  overlayLayer.moveToTop();
   photoLayer.draw();
+});
+
+canvasContainer.addEventListener('touchend', (e) => {
+  if (e.touches.length < 2) lastDistance = 0;
 });
 
 // Download fixo 800x800px (sem overlay)
