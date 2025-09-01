@@ -5,7 +5,7 @@ const zoomOutButton = document.getElementById('zoom-out');
 const resetButton = document.getElementById('reset');
 const downloadButton = document.getElementById('download');
 
-let stage, photoLayer, frameLayer, photo, frame;
+let stage, photoLayer, frameLayer, photo, frame, transformer;
 
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
@@ -40,6 +40,14 @@ const initCanvas = () => {
     frameLayer.add(frame);
     frameLayer.draw();
   };
+
+  // Adicionar Transformer para redimensionar a foto via touch/pinch
+  transformer = new Konva.Transformer({
+    nodes: [],
+    rotateEnabled: false,
+    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
+  });
+  photoLayer.add(transformer);
 };
 
 const enableControls = () => {
@@ -66,7 +74,9 @@ fileInput.addEventListener('change', (e) => {
     const img = new Image();
     img.src = reader.result;
     img.onload = () => {
-      if (photo) photoLayer.remove(photo);
+      if (photo) {
+        photoLayer.remove(photo);
+      }
 
       const containerSize = stage.width();
       const scale = Math.min(containerSize / img.width, containerSize / img.height);
@@ -81,6 +91,7 @@ fileInput.addEventListener('change', (e) => {
       });
 
       photoLayer.add(photo);
+      transformer.nodes([photo]); // vincula o transformer à foto
       photoLayer.draw();
       enableControls();
     };
