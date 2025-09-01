@@ -1,13 +1,32 @@
+/* BODY: background animado + centralização */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f9fafb;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
+
+  /* Gradiente animado */
+  background: linear-gradient(270deg, #1e6dec, #0030b5, #1e6dec);
+  background-size: 600% 600%;
+  animation: gradientMove 15s ease infinite;
 }
 
+/* Animação do gradiente */
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Container principal */
 .container {
   background-color: white;
   padding: 20px;
@@ -18,6 +37,7 @@ body {
   max-width: 600px;
 }
 
+/* Canvas */
 #canvas-container {
   position: relative;
   width: 90%; /* usa 90% da largura da tela */
@@ -28,8 +48,10 @@ body {
   border-radius: 10px;
   overflow: hidden;
   box-sizing: border-box;
+  background-color: #fff; /* mantém o fundo do canvas branco */
 }
 
+/* Controles (botões, slider) */
 .controls {
   display: flex;
   justify-content: center;
@@ -49,30 +71,3 @@ body {
   background-color: #ccc;
   cursor: not-allowed;
 }
-
-/* Fundo mesh gradient animado */
-.background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
-              radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
-              radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
-  animation: moveGradient 15s ease-in-out infinite alternate;
-  z-index: -1;
-}
-
-@keyframes moveGradient {
-  0% {
-    transform: translate(0, 0) scale(1);
-  }
-  50% {
-    transform: translate(-25%, -25%) scale(1.2);
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-  }
-}
-
