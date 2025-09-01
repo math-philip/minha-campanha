@@ -4,7 +4,8 @@ const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
 const sizeSlider = document.getElementById('size-slider');
 
-let stage, photoLayer, frameLayer, photo, frame, transformer, overlay;
+let stage, photoLayer, frameLayer, overlayLayer;
+let photo, frame, overlayImg, transformer;
 let lastDistance = 0;
 
 const initCanvas = () => {
@@ -20,39 +21,13 @@ const initCanvas = () => {
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Overlay tipo “buraco” com borda tracejada
-  overlay = new Konva.Shape({
-    sceneFunc: function(ctx, shape) {
-      const radius = stage.width() / 2;
-      const centerX = stage.width() / 2;
-      const centerY = stage.height() / 2;
-
-      // escurece toda a área
-      ctx.fillStyle = 'rgba(0,0,0,0.3)';
-      ctx.fillRect(0, 0, stage.width(), stage.height());
-
-      // cria o “buraco” central transparente
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
-      ctx.fill();
-
-      // volta ao modo normal para desenhar a borda
-      ctx.globalCompositeOperation = 'source-over';
-
-      // borda circular tracejada
-      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-      ctx.lineWidth = 4;
-      ctx.setLineDash([10, 5]);
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    },
-    listening: false
+  // Transformer
+  transformer = new Konva.Transformer({
+    nodes: [],
+    rotateEnabled: false,
+    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
   });
-  photoLayer.add(overlay);
-  overlay.moveToTop();
+  photoLayer.add(transformer);
 
   // Layer da moldura
   frameLayer = new Konva.Layer();
@@ -74,12 +49,24 @@ const initCanvas = () => {
     frameLayer.draw();
   };
 
-  transformer = new Konva.Transformer({
-    nodes: [],
-    rotateEnabled: false,
-    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
-  });
-  photoLayer.add(transformer);
+  // Layer do overlay estático de referência
+  overlayLayer = new Konva.Layer();
+  stage.add(overlayLayer);
+
+  const overlayStatic = new Image();
+  overlayStatic.src = 'overlay.png';
+  overlayStatic.onload = () => {
+    overlayImg = new Konva.Image({
+      x: 0,
+      y: 0,
+      image: overlayStatic,
+      width: stage.width(),
+      height: stage.height(),
+      listening: false // não interfere no clique
+    });
+    overlayLayer.add(overlayImg);
+    overlayLayer.draw();
+  };
 
   // Scroll para zoom desktop
   stage.on('wheel', (e) => {
@@ -100,17 +87,16 @@ const initCanvas = () => {
     photo.y(pointer.y - mousePointTo.y * photo.scaleY());
 
     photoLayer.draw();
-    if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
   });
 };
 
 // Botão "Escolher arquivo"
 chooseFileBtn.addEventListener('click', () => {
-  fileInput.value = ''; // reset input
+  fileInput.value = '';
   fileInput.click();
 });
 
-// Upload da foto com fit cover e animação
+// Upload da foto com fit cover
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -150,25 +136,9 @@ fileInput.addEventListener('change', (e) => {
         });
       }
 
-      overlay.moveToTop();
+      overlayLayer.moveToTop(); // garante que o overlay fique acima
       frameLayer.draw();
       photoLayer.draw();
-
-      // animação de zoom de entrada
-      const tween = new Konva.Tween({
-        node: photo,
-        duration: 0.5,
-        scaleX: 1,
-        scaleY: 1,
-        easing: Konva.Easings.EaseInOut
-      });
-      tween.play();
-
-      if (sizeSlider) {
-        sizeSlider.value = 100;
-        sizeSlider.min = 10;
-        sizeSlider.max = 300;
-      }
     };
   };
   reader.readAsDataURL(file);
@@ -187,8 +157,6 @@ sizeSlider.addEventListener('input', () => {
   photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
   photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
-  overlay.moveToTop();
-  frameLayer.draw();
   photoLayer.draw();
 });
 
@@ -216,15 +184,8 @@ canvasContainer.addEventListener('touchmove', (e) => {
   }
 
   lastDistance = distance;
-  overlay.moveToTop();
-  frameLayer.draw();
+  overlayLayer.moveToTop(); // sempre acima
   photoLayer.draw();
-
-  if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
-});
-
-canvasContainer.addEventListener('touchend', (e) => {
-  if (e.touches.length < 2) lastDistance = 0;
 });
 
 // Download fixo 800x800px (sem overlay)
@@ -270,6 +231,12 @@ window.addEventListener('resize', () => {
     frame.height(newSize);
   }
 
+  if (overlayImg) {
+    overlayImg.width(newSize);
+    overlayImg.height(newSize);
+    overlayLayer.draw();
+  }
+
   if (photo) {
     const scale = Math.max(newSize / photo.getImage().width, newSize / photo.getImage().height);
     photo.setAttrs({
@@ -280,12 +247,9 @@ window.addEventListener('resize', () => {
       width: photo.getImage().width * scale,
       height: photo.getImage().height * scale
     });
-    if (sizeSlider) sizeSlider.value = 100;
   }
 
-  overlay.width(newSize);
-  overlay.height(newSize);
-  overlay.moveToTop();
+  overlayLayer.moveToTop();
   frameLayer.draw();
   photoLayer.draw();
 });
