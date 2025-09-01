@@ -29,20 +29,20 @@ body {
 /* Container do título */
 .title-container {
   background-color: white;
-  padding: 20px;
+  padding: 20px;          /* padding vertical e lateral */
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 600px;
   text-align: center;
-  margin-bottom: 20px;
+  margin: 0 auto 20px auto; /* centraliza horizontalmente e adiciona margem inferior */
 }
 
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   margin: 0 0 10px 0;
-  color: #0030b5; /* título azul */
+  color: #0030b5;
 }
 
 .title-container p {
@@ -50,13 +50,13 @@ body {
   font-style: italic;
   font-size: 1rem;
   margin: 0;
-  color: black; /* subtítulo preto */
+  color: black;
 }
 
 /* Container do editor */
 .container {
   background-color: white;
-  padding: 20px;
+  padding: 20px;       /* padding lateral consistente com o título */
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   width: 100%;
@@ -85,7 +85,6 @@ body {
 
 .controls button {
   padding: 10px 20px;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -93,17 +92,19 @@ body {
   font-weight: 500;
 }
 
-/* Cores dos botões */
+/* Botão Escolha sua foto */
 #choose-file {
-  background-color: #0eb287; /* verde */
+  background-color: #0eb287;
+  color: white;
 }
 
+/* Botão Download */
 #download {
-  background-color: #1e6dec; /* azul */
   display: none; /* só aparece depois que a pessoa escolher a foto */
+  background-color: #1e6dec;
+  color: white;
 }
 
-/* Input file escondido */
 #file-input {
-  display: none;
+  display: none; /* oculta o input nativo */
 }
