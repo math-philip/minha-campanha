@@ -1,9 +1,10 @@
 const canvasContainer = document.getElementById('canvas-container');
 const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
-const sizeSlider = document.getElementById('size-slider'); // Slider do zoom
+const sizeSlider = document.getElementById('size-slider');
 
 let stage, photoLayer, frameLayer, photo, frame, transformer;
+let lastDistance = 0;
 
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
@@ -18,7 +19,7 @@ const initCanvas = () => {
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Layer da moldura (sempre acima)
+  // Layer da moldura
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
@@ -39,7 +40,7 @@ const initCanvas = () => {
     frameLayer.draw();
   };
 
-  // Transformer para redimensionar a foto com touch/pinch
+  // Transformer (opcional, para mostrar bordas em touch)
   transformer = new Konva.Transformer({
     nodes: [],
     rotateEnabled: false,
@@ -47,7 +48,7 @@ const initCanvas = () => {
   });
   photoLayer.add(transformer);
 
-  // Scroll para zoom
+  // Scroll para zoom desktop
   stage.on('wheel', (e) => {
     if (!photo) return;
     e.evt.preventDefault();
@@ -58,7 +59,7 @@ const initCanvas = () => {
     photo.scaleX(photo.scaleX() * direction);
     photo.scaleY(photo.scaleY() * direction);
 
-    // Ajustar posição para zoom centrado no cursor
+    // centralizar no cursor
     const mousePointTo = {
       x: (pointer.x - photo.x()) / oldScale,
       y: (pointer.y - photo.y()) / oldScale
@@ -68,25 +69,14 @@ const initCanvas = () => {
 
     photoLayer.draw();
 
-    // Atualizar slider
     if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
   });
 };
 
-const enableControls = () => {
-  downloadButton.disabled = false;
-  sizeSlider.disabled = false;
-};
-
-const disableControls = () => {
-  downloadButton.disabled = true;
-  sizeSlider.disabled = true;
-};
-
+// Upload da foto
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
-  disableControls();
 
   const reader = new FileReader();
   reader.onload = () => {
@@ -117,14 +107,12 @@ fileInput.addEventListener('change', (e) => {
         sizeSlider.min = 10;
         sizeSlider.max = 300;
       }
-
-      enableControls();
     };
   };
   reader.readAsDataURL(file);
 });
 
-// Slider para zoom
+// Slider de zoom
 if (sizeSlider) {
   sizeSlider.addEventListener('input', () => {
     if (!photo) return;
@@ -135,7 +123,6 @@ if (sizeSlider) {
     photo.scaleX(scale);
     photo.scaleY(scale);
 
-    // manter foto centralizada
     photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
     photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
@@ -143,7 +130,41 @@ if (sizeSlider) {
   });
 }
 
-// Download com merge das camadas
+// Pinch-to-zoom para celular
+canvasContainer.addEventListener('touchmove', (e) => {
+  if (!photo || e.touches.length !== 2) return;
+  e.preventDefault();
+
+  const touch1 = e.touches[0];
+  const touch2 = e.touches[1];
+  const dx = touch2.clientX - touch1.clientX;
+  const dy = touch2.clientY - touch1.clientY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (lastDistance) {
+    const scaleChange = distance / lastDistance;
+    photo.scaleX(photo.scaleX() * scaleChange);
+    photo.scaleY(photo.scaleY() * scaleChange);
+
+    // centralizar entre os dedos
+    const centerX = (touch1.clientX + touch2.clientX) / 2 - canvasContainer.getBoundingClientRect().left;
+    const centerY = (touch1.clientY + touch2.clientY) / 2 - canvasContainer.getBoundingClientRect().top;
+    const oldScale = photo.scaleX() / scaleChange;
+    photo.x(centerX - (centerX - photo.x()) * (photo.scaleX() / oldScale));
+    photo.y(centerY - (centerY - photo.y()) * (photo.scaleY() / oldScale));
+  }
+
+  lastDistance = distance;
+  photoLayer.draw();
+
+  if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
+});
+
+canvasContainer.addEventListener('touchend', (e) => {
+  if (e.touches.length < 2) lastDistance = 0;
+});
+
+// Download
 downloadButton.addEventListener('click', () => {
   const containerSize = stage.width();
   const mergedCanvas = document.createElement('canvas');
