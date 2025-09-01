@@ -80,14 +80,6 @@ fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  // remover foto antiga
-  if (photo) {
-    photoLayer.remove(photo);
-    transformer.nodes([]);
-    photo = null;
-    photoLayer.draw();
-  }
-
   const reader = new FileReader();
   reader.onload = () => {
     const img = new Image();
@@ -96,17 +88,31 @@ fileInput.addEventListener('change', (e) => {
       const containerSize = stage.width();
       const scale = Math.min(containerSize / img.width, containerSize / img.height);
 
-      photo = new Konva.Image({
-        x: (containerSize - img.width * scale) / 2,
-        y: (containerSize - img.height * scale) / 2,
-        image: img,
-        width: img.width * scale,
-        height: img.height * scale,
-        draggable: true
-      });
+      if (!photo) {
+        // criar novo node se não existir
+        photo = new Konva.Image({
+          x: (containerSize - img.width * scale) / 2,
+          y: (containerSize - img.height * scale) / 2,
+          image: img,
+          width: img.width * scale,
+          height: img.height * scale,
+          draggable: true
+        });
+        photoLayer.add(photo);
+        transformer.nodes([photo]);
+      } else {
+        // substituir imagem mantendo node e transformer
+        photo.image(img);
+        photo.setAttrs({
+          x: (containerSize - img.width * scale) / 2,
+          y: (containerSize - img.height * scale) / 2,
+          width: img.width * scale,
+          height: img.height * scale,
+          scaleX: scale,
+          scaleY: scale
+        });
+      }
 
-      photoLayer.add(photo);
-      transformer.nodes([photo]);
       photoLayer.draw();
 
       if (sizeSlider) {
