@@ -5,7 +5,7 @@ const zoomOutButton = document.getElementById('zoom-out');
 const resetButton = document.getElementById('reset');
 const downloadButton = document.getElementById('download');
 
-let stage, layer, photo, frame;
+let stage, photoLayer, frameLayer, photo, frame;
 
 const initCanvas = () => {
   stage = new Konva.Stage({
@@ -14,10 +14,15 @@ const initCanvas = () => {
     height: canvasContainer.offsetHeight
   });
 
-  layer = new Konva.Layer();
-  stage.add(layer);
+  // Layer da foto
+  photoLayer = new Konva.Layer();
+  stage.add(photoLayer);
 
-  // Moldura
+  // Layer da moldura (sempre acima)
+  frameLayer = new Konva.Layer();
+  stage.add(frameLayer);
+
+  // Adicionar moldura
   const frameImage = new Image();
   frameImage.src = 'moldura.png';
   frameImage.onload = () => {
@@ -29,8 +34,8 @@ const initCanvas = () => {
       height: stage.height(),
       draggable: false
     });
-    layer.add(frame);
-    layer.draw();
+    frameLayer.add(frame);
+    frameLayer.draw();
   };
 };
 
@@ -58,7 +63,7 @@ fileInput.addEventListener('change', (e) => {
     const img = new Image();
     img.src = reader.result;
     img.onload = () => {
-      if (photo) layer.remove(photo);
+      if (photo) photoLayer.remove(photo);
 
       photo = new Konva.Image({
         x: (stage.width() - img.width / 2) / 2,
@@ -69,10 +74,8 @@ fileInput.addEventListener('change', (e) => {
         draggable: true
       });
 
-      layer.add(photo);
-      // Garantir que a moldura fique sempre no topo
-      if (frame) layer.moveToTop(frame);
-      layer.draw();
+      photoLayer.add(photo);
+      photoLayer.draw();
       enableControls();
     };
   };
@@ -83,14 +86,14 @@ zoomInButton.addEventListener('click', () => {
   if (!photo) return;
   photo.scaleX(photo.scaleX() * 1.1);
   photo.scaleY(photo.scaleY() * 1.1);
-  layer.draw();
+  photoLayer.draw();
 });
 
 zoomOutButton.addEventListener('click', () => {
   if (!photo) return;
   photo.scaleX(photo.scaleX() * 0.9);
   photo.scaleY(photo.scaleY() * 0.9);
-  layer.draw();
+  photoLayer.draw();
 });
 
 resetButton.addEventListener('click', () => {
@@ -101,13 +104,22 @@ resetButton.addEventListener('click', () => {
     scaleX: 1,
     scaleY: 1
   });
-  layer.draw();
+  photoLayer.draw();
 });
 
 downloadButton.addEventListener('click', () => {
-  // Garantir que a moldura esteja no topo antes do download
-  if (frame) layer.moveToTop(frame);
-  const dataURL = stage.toDataURL();
+  // Merge layers em um canvas temporário para exportar
+  const mergedCanvas = document.createElement('canvas');
+  mergedCanvas.width = stage.width();
+  mergedCanvas.height = stage.height();
+  const ctx = mergedCanvas.getContext('2d');
+
+  // Desenhar foto primeiro
+  ctx.drawImage(photo.getImage(), photo.x(), photo.y(), photo.width() * photo.scaleX(), photo.height() * photo.scaleY());
+  // Desenhar moldura por cima
+  ctx.drawImage(frame.getImage(), frame.x(), frame.y(), frame.width() * frame.scaleX(), frame.height() * frame.scaleY());
+
+  const dataURL = mergedCanvas.toDataURL('image/png');
   const a = document.createElement('a');
   a.href = dataURL;
   a.download = 'foto_com_moldura.png';
