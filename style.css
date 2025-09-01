@@ -60,7 +60,7 @@ body {
 
 .controls {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* inicial centralizado */
   gap: 10px;
   flex-wrap: wrap;
 }
@@ -72,6 +72,11 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+/* Esconde o input de arquivo real */
+#file-input {
+  display: none;
 }
 
 /* Botão download inicialmente escondido */
