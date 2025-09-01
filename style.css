@@ -4,9 +4,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
-
+  padding: 20px; /* adiciona espaço lateral */
+  
   /* Fundo mesh gradient animado */
   background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
               radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
@@ -26,20 +27,20 @@ body {
 
 /* ===== Container branco ===== */
 .container {
-  background-color: rgba(255, 255, 255, 0.85); /* semi-transparente para ver o gradiente */
+  background-color: rgba(255, 255, 255, 0.95); /* mais opaco */
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
-  width: 90%;         /* ocupa 90% da tela por padrão */
-  max-width: 600px;   /* nunca ultrapassa 600px */
-  margin: 20px auto;  /* centraliza e dá espaçamento vertical */
+  width: 100%;         /* ocupa 100% do espaço disponível do body */
+  max-width: 500px;    /* máximo de 500px */
+  box-sizing: border-box;
 }
 
-/* Ajuste para telas muito pequenas (mobile) */
+/* Ajuste para telas pequenas (mobile) */
 @media (max-width: 400px) {
   .container {
-    width: 95%;  /* evita ficar colado nas laterais */
+    max-width: 350px;  /* ainda menor */
     padding: 15px;
   }
 }
@@ -47,8 +48,7 @@ body {
 /* ===== Canvas ===== */
 #canvas-container {
   position: relative;
-  width: 70%;        /* ocupa 70% da largura do container */
-  max-width: 800px;  /* máximo 800px */
+  width: 100%;        /* ocupa 100% do container */
   aspect-ratio: 1 / 1; /* mantém quadrado */
   margin: 20px auto;
   border: 2px dashed #ddd;
