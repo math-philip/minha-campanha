@@ -33,14 +33,15 @@ body {
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
   width: 100%;
-  max-width: 600px;
+  max-width: 600px; /* mesma largura do editor */
+  box-sizing: border-box;
   margin-bottom: 20px;
 }
 
 /* Container do editor */
 .container {
   background-color: white;
-  padding: 20px;
+  padding: 20px; /* mesma padding do título */
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
@@ -65,10 +66,10 @@ body {
 /* Controles */
 .controls {
   display: flex;
-  justify-content: center; /* centralizado inicialmente */
+  justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
-  padding: 10px 0; /* espaçamento entre canvas e botões */
+  padding: 10px 0;
 }
 
 .controls button {
@@ -99,12 +100,12 @@ body {
 @media (max-width: 480px) {
   .title-container,
   .container {
-    padding: 15px; /* mantém padding mesmo em telas pequenas */
+    padding: 15px; /* mantém padding igual nos dois */
     margin: 10px;
   }
 
   #canvas-container {
-    width: 95%; /* canvas menor que a tela */
+    width: 95%;
   }
 
   .controls {
