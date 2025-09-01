@@ -79,23 +79,29 @@ body {
   display: flex;
   justify-content: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .controls button {
   padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-family: 'Montserrat', sans-serif;
   font-weight: 500;
+  color: white;
 }
 
+/* Botão Escolha sua foto */
+#choose-file {
+  background-color: #0eb287;
+}
+
+/* Botão Download */
+#download {
+  display: none; /* aparece apenas após selecionar a foto */
+  background-color: #1e6dec;
+}
 #file-input {
   display: none;
-}
-
-#download {
-  display: none; /* só aparece depois que a pessoa escolher a foto */
 }
