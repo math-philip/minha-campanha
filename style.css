@@ -29,20 +29,20 @@ body {
 /* Container do título */
 .title-container {
   background-color: white;
-  padding: 20px;          /* padding vertical e lateral */
+  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 600px;
   text-align: center;
-  margin: 0 auto 20px auto; /* centraliza horizontalmente e adiciona margem inferior */
+  margin-bottom: 20px;
 }
 
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   margin: 0 0 10px 0;
-  color: #0030b5;
+  color: #0030b5; /* título azul */
 }
 
 .title-container p {
@@ -50,13 +50,13 @@ body {
   font-style: italic;
   font-size: 1rem;
   margin: 0;
-  color: black;
+  color: black; /* subtítulo preto */
 }
 
 /* Container do editor */
 .container {
   background-color: white;
-  padding: 20px;       /* padding lateral consistente com o título */
+  padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   width: 100%;
@@ -85,6 +85,8 @@ body {
 
 .controls button {
   padding: 10px 20px;
+  background-color: #0eb287; /* Escolha sua foto */
+  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -92,19 +94,29 @@ body {
   font-weight: 500;
 }
 
-/* Botão Escolha sua foto */
-#choose-file {
-  background-color: #0eb287;
-  color: white;
+#file-input {
+  display: none;
 }
 
-/* Botão Download */
 #download {
   display: none; /* só aparece depois que a pessoa escolher a foto */
-  background-color: #1e6dec;
+  background-color: #1e6dec; /* botão Baixar foto */
   color: white;
 }
 
-#file-input {
-  display: none; /* oculta o input nativo */
+/* Responsivo para celulares */
+@media (max-width: 480px) {
+  .title-container,
+  .container {
+    max-width: 90%; /* ocupa menos espaço no celular */
+    padding: 15px;  /* padding lateral maior */
+  }
+
+  .title-container h1 {
+    font-size: 1.4rem; /* título menor no celular */
+  }
+
+  .title-container p {
+    font-size: 0.9rem; /* subtítulo um pouco menor */
+  }
 }
