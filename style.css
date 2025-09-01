@@ -35,7 +35,7 @@ body {
 
 #canvas-container {
   position: relative;
-  width: 90%; /* usa 90% da largura da tela */
+  width: 70%; /* usa 90% da largura da tela */
   max-width: 800px; /* máximo 800px */
   aspect-ratio: 1 / 1; /* força quadrado mesmo em telas diferentes */
   margin: 20px auto;
