@@ -1,9 +1,7 @@
 const canvasContainer = document.getElementById('canvas-container');
 const fileInput = document.getElementById('file-input');
-const zoomInButton = document.getElementById('zoom-in');
-const zoomOutButton = document.getElementById('zoom-out');
-const resetButton = document.getElementById('reset');
 const downloadButton = document.getElementById('download');
+const sizeSlider = document.getElementById('size-slider'); // Slider do zoom
 
 let stage, photoLayer, frameLayer, photo, frame, transformer;
 
@@ -41,27 +39,48 @@ const initCanvas = () => {
     frameLayer.draw();
   };
 
-  // Adicionar Transformer para redimensionar a foto via touch/pinch
+  // Transformer para redimensionar a foto com touch/pinch
   transformer = new Konva.Transformer({
     nodes: [],
     rotateEnabled: false,
     enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
   });
   photoLayer.add(transformer);
+
+  // Scroll para zoom
+  stage.on('wheel', (e) => {
+    if (!photo) return;
+    e.evt.preventDefault();
+    const oldScale = photo.scaleX();
+    const pointer = stage.getPointerPosition();
+    const scaleBy = 1.05;
+    const direction = e.evt.deltaY > 0 ? 1 / scaleBy : scaleBy;
+    photo.scaleX(photo.scaleX() * direction);
+    photo.scaleY(photo.scaleY() * direction);
+
+    // Ajustar posição para zoom centrado no cursor
+    const mousePointTo = {
+      x: (pointer.x - photo.x()) / oldScale,
+      y: (pointer.y - photo.y()) / oldScale
+    };
+    photo.x(pointer.x - mousePointTo.x * photo.scaleX());
+    photo.y(pointer.y - mousePointTo.y * photo.scaleY());
+
+    photoLayer.draw();
+
+    // Atualizar slider
+    if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
+  });
 };
 
 const enableControls = () => {
-  zoomInButton.disabled = false;
-  zoomOutButton.disabled = false;
-  resetButton.disabled = false;
   downloadButton.disabled = false;
+  sizeSlider.disabled = false;
 };
 
 const disableControls = () => {
-  zoomInButton.disabled = true;
-  zoomOutButton.disabled = true;
-  resetButton.disabled = true;
   downloadButton.disabled = true;
+  sizeSlider.disabled = true;
 };
 
 fileInput.addEventListener('change', (e) => {
@@ -74,9 +93,7 @@ fileInput.addEventListener('change', (e) => {
     const img = new Image();
     img.src = reader.result;
     img.onload = () => {
-      if (photo) {
-        photoLayer.remove(photo);
-      }
+      if (photo) photoLayer.remove(photo);
 
       const containerSize = stage.width();
       const scale = Math.min(containerSize / img.width, containerSize / img.height);
@@ -91,40 +108,40 @@ fileInput.addEventListener('change', (e) => {
       });
 
       photoLayer.add(photo);
-      transformer.nodes([photo]); // vincula o transformer à foto
+      transformer.nodes([photo]);
       photoLayer.draw();
+
+      // Configurar slider
+      if (sizeSlider) {
+        sizeSlider.value = scale * 100;
+        sizeSlider.min = 10;
+        sizeSlider.max = 300;
+      }
+
       enableControls();
     };
   };
   reader.readAsDataURL(file);
 });
 
-zoomInButton.addEventListener('click', () => {
-  if (!photo) return;
-  photo.scaleX(photo.scaleX() * 1.1);
-  photo.scaleY(photo.scaleY() * 1.1);
-  photoLayer.draw();
-});
+// Slider para zoom
+if (sizeSlider) {
+  sizeSlider.addEventListener('input', () => {
+    if (!photo) return;
+    const scale = sizeSlider.value / 100;
+    const centerX = stage.width() / 2;
+    const centerY = stage.height() / 2;
+    const oldScale = photo.scaleX();
+    photo.scaleX(scale);
+    photo.scaleY(scale);
 
-zoomOutButton.addEventListener('click', () => {
-  if (!photo) return;
-  photo.scaleX(photo.scaleX() * 0.9);
-  photo.scaleY(photo.scaleY() * 0.9);
-  photoLayer.draw();
-});
+    // manter foto centralizada
+    photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
+    photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
-resetButton.addEventListener('click', () => {
-  if (!photo) return;
-  const containerSize = stage.width();
-  const scale = Math.min(containerSize / photo.getImage().width, containerSize / photo.getImage().height);
-  photo.setAttrs({
-    x: (containerSize - photo.getImage().width * scale) / 2,
-    y: (containerSize - photo.getImage().height * scale) / 2,
-    scaleX: scale,
-    scaleY: scale
+    photoLayer.draw();
   });
-  photoLayer.draw();
-});
+}
 
 // Download com merge das camadas
 downloadButton.addEventListener('click', () => {
@@ -134,9 +151,7 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.height = containerSize;
   const ctx = mergedCanvas.getContext('2d');
 
-  // Desenhar foto
   ctx.drawImage(photo.getImage(), photo.x(), photo.y(), photo.width() * photo.scaleX(), photo.height() * photo.scaleY());
-  // Desenhar moldura
   ctx.drawImage(frame.getImage(), frame.x(), frame.y(), frame.width() * frame.scaleX(), frame.height() * frame.scaleY());
 
   const dataURL = mergedCanvas.toDataURL('image/png');
@@ -165,6 +180,7 @@ window.addEventListener('resize', () => {
       scaleX: scale,
       scaleY: scale
     });
+    if (sizeSlider) sizeSlider.value = scale * 100;
   }
 
   frameLayer.draw();
