@@ -7,17 +7,21 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Editor de Moldura</h1>
-  
-  <div class="editor">
-    <canvas id="canvas" width="800" height="800"></canvas>
-    <img id="overlay" src="overlay.png" alt="Overlay">
-  </div>
+  <div class="background"></div>
+  <div class="editor-container">
+    <h1>Editor de Moldura</h1>
+    <input type="file" id="fileInput" accept="image/*">
+    
+    <div class="canvas-container">
+      <canvas id="editorCanvas" width="800" height="800"></canvas>
+      <img id="overlay" src="overlay.png" alt="Overlay">
+    </div>
 
-  <div class="controls">
-    <input type="file" id="upload" accept="image/*">
-    <input type="range" id="zoom" min="0.5" max="3" step="0.01" value="1">
-    <button id="download">Baixar Imagem</button>
+    <div class="controls">
+      <label for="zoomSlider">Zoom:</label>
+      <input type="range" id="zoomSlider" min="0.5" max="3" step="0.01" value="1">
+      <button id="downloadBtn">Baixar Imagem</button>
+    </div>
   </div>
 
   <script src="script.js"></script>
