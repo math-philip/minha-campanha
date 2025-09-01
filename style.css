@@ -1,20 +1,18 @@
-/* Importa a fonte Montserrat */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;900&display=swap');
-
+/* Fonte Montserrat */
 body {
   font-family: 'Montserrat', sans-serif;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
-  min-height: 100vh;
+  justify-content: flex-start;
   margin: 0;
+  min-height: 100vh;
   padding: 20px;
 
-  /* Fundo mesh gradient animado só com tons de azul */
-  background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 40%),
-              radial-gradient(circle at 80% 70%, #0030b5, #001f80 40%),
-              radial-gradient(circle at 50% 50%, #1e6dec, #002080 40%);
+  /* Fundo gradiente azul animado */
+  background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 80%),
+              radial-gradient(circle at 80% 70%, #0030b5, #1e6dec 80%),
+              radial-gradient(circle at 50% 50%, #1e6dec, #0030b5 80%);
   background-size: 200% 200%;
   animation: meshMove 15s ease-in-out infinite alternate;
 }
@@ -33,16 +31,16 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 600px;
+  text-align: center;
   margin-bottom: 20px;
 }
 
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
-  font-size: 2rem;  /* ligeiramente menor */
+  font-size: 1.8rem;
   margin: 0 0 10px 0;
 }
 
@@ -58,18 +56,16 @@ body {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 600px;
-  box-sizing: border-box;
+  text-align: center;
 }
 
 /* Canvas */
 #canvas-container {
   position: relative;
-  width: 70%;
-  max-width: 800px;
+  width: 100%;
   aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
@@ -83,7 +79,6 @@ body {
   display: flex;
   justify-content: center;
   gap: 10px;
-  margin-top: 10px;
 }
 
 .controls button {
@@ -93,9 +88,14 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
 }
 
-.controls button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+#file-input {
+  display: none;
+}
+
+#download {
+  display: none; /* só aparece depois que a pessoa escolher a foto */
 }
