@@ -6,8 +6,9 @@ body {
   align-items: center;
   margin: 0;
   min-height: 100vh;
+  padding: 15px; /* Padding lateral garantido em todas as telas */
 
-  /* Fundo mesh gradient animado apenas em azul */
+  /* Fundo mesh gradient animado azul */
   background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 60%),
               radial-gradient(circle at 80% 70%, #0030b5, #1e6dec 60%),
               radial-gradient(circle at 50% 50%, #1e6dec, #0030b5 60%);
@@ -23,10 +24,10 @@ body {
 /* Containers com mesmo padding e largura */
 .title-container, .container {
   background-color: white;
-  padding: 20px; /* padding consistente em todas as laterais */
+  padding: 20px;
   border-radius: 10px;
-  width: 90%;
-  max-width: 600px;
+  width: 100%;       /* ocupa toda a largura disponível do body */
+  max-width: 600px;  /* não ultrapassa 600px */
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
   margin-bottom: 20px;
@@ -55,7 +56,7 @@ body {
 /* Canvas */
 #canvas-container {
   position: relative;
-  width: 70%;
+  width: 100%;
   max-width: 800px;
   aspect-ratio: 1 / 1;
   margin: 20px auto;
@@ -96,16 +97,4 @@ body {
 /* Esconde o input nativo */
 #file-input {
   display: none;
-}
-
-/* Responsividade */
-@media (max-width: 500px) {
-  .title-container, .container {
-    width: 95%;
-    padding: 15px; /* mantém padding lateral menor em celular */
-  }
-
-  #canvas-container {
-    width: 90%;
-  }
 }
