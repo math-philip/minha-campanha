@@ -4,18 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editor de Fotos com Moldura</title>
+  <script src="https://cdn.jsdelivr.net/npm/konva@8.4.3/konva.min.js"></script>
 
-  <!-- Google Fonts Montserrat -->
+  <!-- Montserrat Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,900;1,500&display=swap" rel="stylesheet">
 
-  <script src="https://cdn.jsdelivr.net/npm/konva@8.4.3/konva.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
   <!-- Container do título -->
   <div class="title-container">
-    <h1>Apoie nossa Chapa!</h1>
+    <h1>Editor de Fotos com Moldura</h1>
     <p>Adicione nossa moldura em sua foto de perfil e apoie nossa campanha!</p>
   </div>
 
@@ -28,7 +27,7 @@
     <div class="controls">
       <button id="choose-file">Escolha sua foto</button>
       <input type="file" id="file-input" accept="image/*">
-      <button id="download">Download</button>
+      <button id="download" style="display:none;">Download</button>
     </div>
   </div>
 
