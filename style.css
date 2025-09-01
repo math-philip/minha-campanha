@@ -15,28 +15,31 @@ body {
   animation: meshMove 15s ease-in-out infinite alternate;
 }
 
-/* Animação do gradiente */
 @keyframes meshMove {
   0% { background-position: 0% 0%, 100% 0%, 0% 100%; }
   100% { background-position: 100% 100%, 0% 100%, 100% 0%; }
 }
 
-/* Container do título */
-.title-container {
+/* Containers com mesmo padding e largura */
+.title-container, .container {
   background-color: white;
-  padding: 20px;
+  padding: 20px; /* padding consistente em todas as laterais */
   border-radius: 10px;
   width: 90%;
   max-width: 600px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
   text-align: center;
-  margin-top: 20px; /* espaçamento do topo */
-  margin-bottom: 20px; /* espaço entre título e editor */
+  margin-bottom: 20px;
+}
+
+/* Espaçamento do topo apenas no título */
+.title-container {
+  margin-top: 20px;
 }
 
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
-  font-size: 1.8rem; /* um pouco menor */
+  font-size: 1.8rem;
   color: #0030b5;
   margin: 0;
 }
@@ -47,18 +50,6 @@ body {
   color: #000;
   margin-top: 10px;
   margin-bottom: 0;
-}
-
-/* Container do editor */
-.container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 600px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 /* Canvas */
@@ -111,7 +102,7 @@ body {
 @media (max-width: 500px) {
   .title-container, .container {
     width: 95%;
-    padding: 15px;
+    padding: 15px; /* mantém padding lateral menor em celular */
   }
 
   #canvas-container {
