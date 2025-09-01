@@ -6,12 +6,30 @@
   <title>Editor de Fotos com Moldura</title>
   <script src="https://cdn.jsdelivr.net/npm/konva@8.4.3/konva.min.js"></script>
   <style>
+    /* Fundo mesh gradient animado */
     body {
       font-family: Arial, sans-serif;
       text-align: center;
       margin: 0;
       padding: 20px;
-      background-color: #1e6dec;
+      color: white;
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
+                  radial-gradient(circle at 80% 70%, #0030b5, transparent 40%),
+                  radial-gradient(circle at 50% 50%, #1e6dec, transparent 40%);
+      background-size: 200% 200%;
+      animation: meshMove 15s ease-in-out infinite alternate;
+    }
+
+    @keyframes meshMove {
+      0% {
+        background-position: 0% 0%, 100% 0%, 0% 100%;
+      }
+      100% {
+        background-position: 100% 100%, 0% 100%, 100% 0%;
+      }
     }
 
     #canvas-container {
@@ -37,6 +55,15 @@
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #1e6dec;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #0030b5;
     }
 
     input[type="file"] {
