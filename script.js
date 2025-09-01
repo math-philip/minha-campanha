@@ -20,34 +20,34 @@ const initCanvas = () => {
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Overlay circular estilo Twibbon com borda tracejada
+  // Overlay tipo “buraco” com borda tracejada
   overlay = new Konva.Shape({
     sceneFunc: function(ctx, shape) {
       const radius = stage.width() / 2;
       const centerX = stage.width() / 2;
       const centerY = stage.height() / 2;
 
-      // escurece a área externa
+      // escurece toda a área
       ctx.fillStyle = 'rgba(0,0,0,0.3)';
       ctx.fillRect(0, 0, stage.width(), stage.height());
 
-      // círculo central transparente
+      // cria o “buraco” central transparente
       ctx.globalCompositeOperation = 'destination-out';
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
       ctx.fill();
 
-      // volta ao padrão
+      // volta ao modo normal para desenhar a borda
       ctx.globalCompositeOperation = 'source-over';
 
       // borda circular tracejada
       ctx.strokeStyle = 'rgba(255,255,255,0.8)';
       ctx.lineWidth = 4;
-      ctx.setLineDash([10, 5]); // 10px de traço, 5px de espaço
+      ctx.setLineDash([10, 5]);
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
       ctx.stroke();
-      ctx.setLineDash([]); // reseta para não afetar outros desenhos
+      ctx.setLineDash([]);
     },
     listening: false
   });
