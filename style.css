@@ -1,22 +1,15 @@
-/* BODY com gradiente animado */
-html, body {
-  height: 100%;
-  margin: 0;
-}
-
-body {
-  font-family: Arial, sans-serif;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* fica no topo da tela */
-  align-items: center;
-  min-height: 100vh;
-  margin: 0;
-
-  /* Gradiente animado do site inteiro */
+/* Fundo animado atrás de tudo */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: linear-gradient(270deg, #1e6dec, #0030b5, #1e6dec);
   background-size: 600% 600%;
   animation: gradientMove 15s ease infinite;
+  z-index: -9999; /* fica atrás de todo conteúdo */
 }
 
 /* Animação do gradiente */
@@ -26,9 +19,20 @@ body {
   100% { background-position: 0% 50%; }
 }
 
+/* BODY: centraliza conteúdo do site */
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* mantém o topo */
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  position: relative;
+}
+
 /* Canvas */
 #canvas-container {
-  position: relative;
   width: 90%;
   max-width: 800px;
   aspect-ratio: 1 / 1;
@@ -36,8 +40,8 @@ body {
   border: 2px dashed #ddd;
   border-radius: 10px;
   overflow: hidden;
+  background-color: transparent; /* transparente para mostrar o gradiente atrás */
   box-sizing: border-box;
-  background-color: transparent; /* deixa o gradiente visível atrás */
 }
 
 /* Slider */
