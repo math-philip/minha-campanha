@@ -1,3 +1,14 @@
+// ------------------------------
+// Fundo animado do site
+// ------------------------------
+const body = document.querySelector('body');
+const bgDiv = document.createElement('div');
+bgDiv.id = 'site-background';
+body.prepend(bgDiv); // insere atrás de todo conteúdo
+
+// ------------------------------
+// Seletores do DOM
+// ------------------------------
 const canvasContainer = document.getElementById('canvas-container');
 const chooseFileBtn = document.getElementById('choose-file');
 const fileInput = document.getElementById('file-input');
@@ -8,6 +19,9 @@ let stage, photoLayer, frameLayer, overlayLayer;
 let photo, frame, overlayImg, transformer;
 let lastDistance = 0;
 
+// ------------------------------
+// Inicializa o canvas
+// ------------------------------
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
 
@@ -62,7 +76,7 @@ const initCanvas = () => {
       image: overlayStatic,
       width: stage.width(),
       height: stage.height(),
-      listening: false // não interfere na interação
+      listening: false
     });
     overlayLayer.add(overlayImg);
     overlayLayer.draw();
@@ -90,13 +104,17 @@ const initCanvas = () => {
   });
 };
 
+// ------------------------------
 // Botão "Escolher arquivo"
+// ------------------------------
 chooseFileBtn.addEventListener('click', () => {
   fileInput.value = '';
   fileInput.click();
 });
 
+// ------------------------------
 // Upload da foto com fit cover + animação
+// ------------------------------
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -124,7 +142,7 @@ fileInput.addEventListener('change', (e) => {
           width: finalWidth,
           height: finalHeight,
           draggable: true,
-          scaleX: 0, // inicia animação
+          scaleX: 0,
           scaleY: 0
         });
         photoLayer.add(photo);
@@ -151,7 +169,7 @@ fileInput.addEventListener('change', (e) => {
       });
       tween.play();
 
-      overlayLayer.moveToTop(); // garante overlay acima
+      overlayLayer.moveToTop();
       frameLayer.draw();
       photoLayer.draw();
 
@@ -165,7 +183,9 @@ fileInput.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
+// ------------------------------
 // Slider de zoom
+// ------------------------------
 sizeSlider.addEventListener('input', () => {
   if (!photo) return;
   const scale = sizeSlider.value / 100;
@@ -181,7 +201,9 @@ sizeSlider.addEventListener('input', () => {
   photoLayer.draw();
 });
 
+// ------------------------------
 // Pinch-to-zoom celular
+// ------------------------------
 canvasContainer.addEventListener('touchmove', (e) => {
   if (!photo || e.touches.length !== 2) return;
   e.preventDefault();
@@ -192,91 +214,4 @@ canvasContainer.addEventListener('touchmove', (e) => {
   const dy = touch2.clientY - touch1.clientY;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
-  if (lastDistance) {
-    const scaleChange = distance / lastDistance;
-    photo.scaleX(photo.scaleX() * scaleChange);
-    photo.scaleY(photo.scaleY() * scaleChange);
-
-    const centerX = (touch1.clientX + touch2.clientX) / 2 - canvasContainer.getBoundingClientRect().left;
-    const centerY = (touch1.clientY + touch2.clientY) / 2 - canvasContainer.getBoundingClientRect().top;
-    const oldScale = photo.scaleX() / scaleChange;
-    photo.x(centerX - (centerX - photo.x()) * (photo.scaleX() / oldScale));
-    photo.y(centerY - (centerY - photo.y()) * (photo.scaleY() / oldScale));
-  }
-
-  lastDistance = distance;
-  overlayLayer.moveToTop();
-  photoLayer.draw();
-});
-
-canvasContainer.addEventListener('touchend', (e) => {
-  if (e.touches.length < 2) lastDistance = 0;
-});
-
-// Download fixo 800x800px (sem overlay)
-downloadButton.addEventListener('click', () => {
-  if (!photo || !frame) return;
-
-  const downloadSize = 800;
-  const mergedCanvas = document.createElement('canvas');
-  mergedCanvas.width = downloadSize;
-  mergedCanvas.height = downloadSize;
-  const ctx = mergedCanvas.getContext('2d');
-
-  const scaleX = photo.width() * photo.scaleX() / stage.width();
-  const scaleY = photo.height() * photo.scaleY() / stage.height();
-  const posX = photo.x() / stage.width() * downloadSize;
-  const posY = photo.y() / stage.height() * downloadSize;
-
-  ctx.drawImage(
-    photo.getImage(),
-    posX,
-    posY,
-    scaleX * downloadSize,
-    scaleY * downloadSize
-  );
-
-  ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
-
-  const dataURL = mergedCanvas.toDataURL('image/png');
-  const a = document.createElement('a');
-  a.href = dataURL;
-  a.download = 'foto_com_moldura.png';
-  a.click();
-});
-
-// Redimensionamento responsivo
-window.addEventListener('resize', () => {
-  const newSize = canvasContainer.offsetWidth;
-  stage.width(newSize);
-  stage.height(newSize);
-
-  if (frame) {
-    frame.width(newSize);
-    frame.height(newSize);
-  }
-
-  if (overlayImg) {
-    overlayImg.width(newSize);
-    overlayImg.height(newSize);
-    overlayLayer.draw();
-  }
-
-  if (photo) {
-    const scale = Math.max(newSize / photo.getImage().width, newSize / photo.getImage().height);
-    photo.setAttrs({
-      x: (newSize - photo.getImage().width * scale) / 2,
-      y: (newSize - photo.getImage().height * scale) / 2,
-      scaleX: 1,
-      scaleY: 1,
-      width: photo.getImage().width * scale,
-      height: photo.getImage().height * scale
-    });
-  }
-
-  overlayLayer.moveToTop();
-  frameLayer.draw();
-  photoLayer.draw();
-});
-
-initCanvas();
+  if
