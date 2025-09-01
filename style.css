@@ -1,55 +1,77 @@
-/* Fonte Montserrat */
+/* Import Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=swap');
+
 body {
   font-family: 'Montserrat', sans-serif;
-  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   min-height: 100vh;
+  margin: 0;
+
+  /* Fundo mesh gradient animado */
   background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 60%),
               radial-gradient(circle at 80% 70%, #0030b5, #1e6dec 60%),
               radial-gradient(circle at 50% 50%, #1e6dec, #0030b5 60%);
   background-size: 200% 200%;
   animation: meshMove 15s ease-in-out infinite alternate;
-  display: block;
-  padding: 0; /* vamos usar padding nos containers */
 }
 
 @keyframes meshMove {
-  0% { background-position: 0% 0%, 100% 0%, 0% 100%; }
-  100% { background-position: 100% 100%, 0% 100%, 100% 0%; }
+  0% {
+    background-position: 0% 0%, 100% 0%, 0% 100%;
+  }
+  100% {
+    background-position: 100% 100%, 0% 100%, 100% 0%;
+  }
 }
 
-/* Containers com padding consistente */
-.title-container, .container {
+/* Container do título */
+.title-container {
   background-color: white;
   padding: 20px;
   border-radius: 10px;
-  width: calc(100% - 30px); /* largura total menos padding do body */
   max-width: 600px;
-  margin: 20px auto; /* centraliza horizontalmente e dá espaçamento vertical */
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  box-sizing: border-box;
+  margin: 20px auto;
   text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-/* Título e subtítulo */
 .title-container h1 {
   font-weight: 900; /* Montserrat Black */
-  font-size: 1.5rem;
+  font-size: 2rem;
   color: #0030b5;
-  margin: 0;
+  margin: 0 0 10px 0;
 }
 
 .title-container p {
-  font-weight: 500;
+  font-weight: 500; /* Montserrat Medium */
   font-style: italic;
-  color: #000;
-  margin-top: 10px;
-  margin-bottom: 0;
+  font-size: 1rem;
+  color: black;
+  margin: 0;
+}
+
+/* Container do editor */
+.container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 600px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 20px auto;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
 /* Canvas */
 #canvas-container {
   position: relative;
   width: 100%;
-  max-width: 800px;
+  max-width: 500px;
   aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
@@ -66,27 +88,26 @@ body {
   flex-wrap: wrap;
 }
 
-/* Botões */
-#choose-file {
+.controls button {
   padding: 10px 20px;
-  background-color: #0eb287;
-  color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  color: white;
+  font-weight: 700;
+  font-family: 'Montserrat', sans-serif;
+}
+
+#choose-file {
+  background-color: #0eb287;
 }
 
 #download {
-  padding: 10px 20px;
   background-color: #1e6dec;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  display: none; /* só aparece após upload */
 }
 
-/* Esconde o input nativo */
-#file-input {
-  display: none;
+/* Desabilitado */
+.controls button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
