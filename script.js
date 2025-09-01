@@ -4,7 +4,7 @@ const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
 const sizeSlider = document.getElementById('size-slider');
 
-let stage, photoLayer, frameLayer, photo, frame, transformer, maskLayer;
+let stage, photoLayer, frameLayer, photo, frame, transformer, overlay;
 let lastDistance = 0;
 
 const initCanvas = () => {
@@ -20,21 +20,17 @@ const initCanvas = () => {
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
 
-  // Layer da máscara circular
-  maskLayer = new Konva.Layer();
-  const circleMask = new Konva.Circle({
-    x: stage.width() / 2,
-    y: stage.height() / 2,
-    radius: stage.width() / 2,
-    fill: 'white',
-    listening: false
+  // Overlay de pré-visualização
+  overlay = new Konva.Rect({
+    x: 0,
+    y: 0,
+    width: stage.width(),
+    height: stage.height(),
+    fill: 'rgba(0,0,0,0.2)', // cor do overlay
+    listening: false // permite interação com a foto
   });
-  maskLayer.add(circleMask);
-  maskLayer.clipFunc((ctx) => {
-    ctx.beginPath();
-    ctx.arc(stage.width() / 2, stage.height() / 2, stage.width() / 2, 0, Math.PI * 2, false);
-  });
-  stage.add(maskLayer);
+  photoLayer.add(overlay);
+  overlay.moveToTop();
 
   // Layer da moldura
   frameLayer = new Konva.Layer();
@@ -118,7 +114,7 @@ fileInput.addEventListener('change', (e) => {
           scaleX: 0.5,
           scaleY: 0.5
         });
-        maskLayer.add(photo);
+        photoLayer.add(photo);
         transformer.nodes([photo]);
       } else {
         photo.image(img);
@@ -132,7 +128,9 @@ fileInput.addEventListener('change', (e) => {
         });
       }
 
-      maskLayer.draw();
+      overlay.moveToTop();
+      frameLayer.draw();
+      photoLayer.draw();
 
       // animação de zoom de entrada
       const tween = new Konva.Tween({
@@ -167,7 +165,9 @@ sizeSlider.addEventListener('input', () => {
   photo.x(centerX - (centerX - photo.x()) * (scale / oldScale));
   photo.y(centerY - (centerY - photo.y()) * (scale / oldScale));
 
-  maskLayer.draw();
+  overlay.moveToTop();
+  frameLayer.draw();
+  photoLayer.draw();
 });
 
 // Pinch-to-zoom celular
@@ -194,7 +194,10 @@ canvasContainer.addEventListener('touchmove', (e) => {
   }
 
   lastDistance = distance;
-  maskLayer.draw();
+  overlay.moveToTop();
+  frameLayer.draw();
+  photoLayer.draw();
+
   if (sizeSlider) sizeSlider.value = photo.scaleX() * 100;
 });
 
@@ -202,7 +205,7 @@ canvasContainer.addEventListener('touchend', (e) => {
   if (e.touches.length < 2) lastDistance = 0;
 });
 
-// Download fixo 800x800px com máscara
+// Download fixo 800x800px (sem overlay)
 downloadButton.addEventListener('click', () => {
   if (!photo || !frame) return;
 
@@ -211,11 +214,6 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.width = downloadSize;
   mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
-
-  // aplicar máscara circular
-  ctx.beginPath();
-  ctx.arc(downloadSize / 2, downloadSize / 2, downloadSize / 2, 0, Math.PI * 2, false);
-  ctx.clip();
 
   const scaleX = photo.width() * photo.scaleX() / stage.width();
   const scaleY = photo.height() * photo.scaleY() / stage.height();
@@ -230,7 +228,6 @@ downloadButton.addEventListener('click', () => {
     scaleY * downloadSize
   );
 
-  // desenhar moldura
   ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
 
   const dataURL = mergedCanvas.toDataURL('image/png');
@@ -264,7 +261,9 @@ window.addEventListener('resize', () => {
     if (sizeSlider) sizeSlider.value = 100;
   }
 
-  maskLayer.draw();
+  overlay.width(newSize);
+  overlay.height(newSize);
+  overlay.moveToTop();
   frameLayer.draw();
   photoLayer.draw();
 });
