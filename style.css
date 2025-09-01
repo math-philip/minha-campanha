@@ -6,7 +6,7 @@ body {
   justify-content: flex-start;
   min-height: 100vh;
   margin: 0;
-  padding: 20px;
+  padding: 20px; /* espaçamento geral */
 
   /* Fundo mesh gradient animado */
   background: radial-gradient(circle at 20% 30%, #1e6dec, transparent 40%),
@@ -25,6 +25,7 @@ body {
   }
 }
 
+/* Container do título */
 .title-container {
   background-color: white;
   padding: 20px;
@@ -36,6 +37,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Container do editor */
 .container {
   background-color: white;
   padding: 20px;
@@ -44,11 +46,13 @@ body {
   text-align: center;
   width: 100%;
   max-width: 600px;
+  box-sizing: border-box;
 }
 
+/* Canvas */
 #canvas-container {
   position: relative;
-  width: 90%;
+  width: 100%;
   max-width: 800px;
   aspect-ratio: 1 / 1;
   margin: 20px auto;
@@ -58,11 +62,13 @@ body {
   box-sizing: border-box;
 }
 
+/* Controles */
 .controls {
   display: flex;
-  justify-content: center; /* inicial centralizado */
+  justify-content: center; /* centralizado inicialmente */
   gap: 10px;
   flex-wrap: wrap;
+  padding: 10px 0; /* espaçamento entre canvas e botões */
 }
 
 .controls button {
@@ -74,7 +80,7 @@ body {
   cursor: pointer;
 }
 
-/* Esconde o input de arquivo real */
+/* Esconde input de arquivo real */
 #file-input {
   display: none;
 }
@@ -87,4 +93,22 @@ body {
 .controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* Ajustes mobile */
+@media (max-width: 480px) {
+  .title-container,
+  .container {
+    padding: 15px; /* mantém padding mesmo em telas pequenas */
+    margin: 10px;
+  }
+
+  #canvas-container {
+    width: 95%; /* canvas menor que a tela */
+  }
+
+  .controls {
+    flex-direction: column;
+    gap: 10px;
+  }
 }
