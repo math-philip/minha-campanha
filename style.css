@@ -1,3 +1,4 @@
+/* ===== Corpo do site ===== */
 body {
   font-family: Arial, sans-serif;
   display: flex;
@@ -23,21 +24,32 @@ body {
   }
 }
 
+/* ===== Container branco ===== */
 .container {
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.85); /* semi-transparente para ver o gradiente */
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   text-align: center;
-  width: 100%;
-  max-width: 600px;
+  width: 90%;         /* ocupa 90% da tela por padrão */
+  max-width: 600px;   /* nunca ultrapassa 600px */
+  margin: 20px auto;  /* centraliza e dá espaçamento vertical */
 }
 
+/* Ajuste para telas muito pequenas (mobile) */
+@media (max-width: 400px) {
+  .container {
+    width: 95%;  /* evita ficar colado nas laterais */
+    padding: 15px;
+  }
+}
+
+/* ===== Canvas ===== */
 #canvas-container {
   position: relative;
-  width: 70%; /* usa 90% da largura da tela */
-  max-width: 800px; /* máximo 800px */
-  aspect-ratio: 1 / 1; /* força quadrado mesmo em telas diferentes */
+  width: 70%;        /* ocupa 70% da largura do container */
+  max-width: 800px;  /* máximo 800px */
+  aspect-ratio: 1 / 1; /* mantém quadrado */
   margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
@@ -45,6 +57,7 @@ body {
   box-sizing: border-box;
 }
 
+/* ===== Controles ===== */
 .controls {
   display: flex;
   justify-content: center;
