@@ -35,9 +35,9 @@ body {
 
 #canvas-container {
   position: relative;
-  width: 90%; /* usa 90% da largura da tela */
-  max-width: 800px; /* máximo 800px */
-  aspect-ratio: 1 / 1; /* força quadrado mesmo em telas diferentes */
+  width: 90%;
+  max-width: 800px;
+  aspect-ratio: 1 / 1;
   margin: 20px auto;
   border: 2px dashed #ddd;
   border-radius: 10px;
@@ -58,9 +58,14 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .controls button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+input[type="file"] {
+  display: none;
 }
