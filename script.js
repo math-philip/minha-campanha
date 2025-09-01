@@ -75,7 +75,7 @@ chooseFileBtn.addEventListener('click', () => {
   fileInput.click();
 });
 
-// Upload da foto
+// Upload da foto com fit to canvas e animação de entrada
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
@@ -86,37 +86,49 @@ fileInput.addEventListener('change', (e) => {
     img.src = reader.result;
     img.onload = () => {
       const containerSize = stage.width();
-      const scale = Math.min(containerSize / img.width, containerSize / img.height);
+      const finalScale = Math.min(containerSize / img.width, containerSize / img.height);
+      const finalX = (containerSize - img.width * finalScale) / 2;
+      const finalY = (containerSize - img.height * finalScale) / 2;
 
       if (!photo) {
-        // criar novo node se não existir
         photo = new Konva.Image({
-          x: (containerSize - img.width * scale) / 2,
-          y: (containerSize - img.height * scale) / 2,
+          x: finalX,
+          y: finalY,
           image: img,
-          width: img.width * scale,
-          height: img.height * scale,
-          draggable: true
+          width: img.width * finalScale,
+          height: img.height * finalScale,
+          draggable: true,
+          scaleX: 0.5, // começa menor
+          scaleY: 0.5
         });
         photoLayer.add(photo);
         transformer.nodes([photo]);
       } else {
-        // substituir imagem mantendo node e transformer
         photo.image(img);
         photo.setAttrs({
-          x: (containerSize - img.width * scale) / 2,
-          y: (containerSize - img.height * scale) / 2,
-          width: img.width * scale,
-          height: img.height * scale,
-          scaleX: scale,
-          scaleY: scale
+          x: finalX,
+          y: finalY,
+          width: img.width * finalScale,
+          height: img.height * finalScale,
+          scaleX: 0.5,
+          scaleY: 0.5
         });
       }
 
       photoLayer.draw();
 
+      // animação de zoom de entrada
+      const tween = new Konva.Tween({
+        node: photo,
+        duration: 0.5,
+        scaleX: 1,
+        scaleY: 1,
+        easing: Konva.Easings.EaseInOut
+      });
+      tween.play();
+
       if (sizeSlider) {
-        sizeSlider.value = scale * 100;
+        sizeSlider.value = 100;
         sizeSlider.min = 10;
         sizeSlider.max = 300;
       }
@@ -221,10 +233,12 @@ window.addEventListener('resize', () => {
     photo.setAttrs({
       x: (newSize - photo.getImage().width * scale) / 2,
       y: (newSize - photo.getImage().height * scale) / 2,
-      scaleX: scale,
-      scaleY: scale
+      scaleX: 1,
+      scaleY: 1,
+      width: photo.getImage().width * scale,
+      height: photo.getImage().height * scale
     });
-    if (sizeSlider) sizeSlider.value = scale * 100;
+    if (sizeSlider) sizeSlider.value = 100;
   }
 
   frameLayer.draw();
