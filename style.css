@@ -64,6 +64,22 @@ body {
   text-align: center;
 }
 
+/* Switch de moldura */
+.frame-switch {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #0030b5;
+}
+
+.frame-switch input[type="radio"] {
+  margin-right: 6px;
+  accent-color: #1e6dec; /* azul para combinar */
+}
+
 /* Canvas */
 #canvas-container {
   position: relative;
@@ -118,5 +134,10 @@ body {
 
   .title-container p {
     font-size: 0.9rem; /* subtítulo um pouco menor */
+  }
+
+  .frame-switch {
+    flex-direction: column;
+    gap: 8px;
   }
 }
