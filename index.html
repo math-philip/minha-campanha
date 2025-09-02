@@ -4,36 +4,39 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Editor de Fotos com Moldura</title>
+  <script src="https://cdn.jsdelivr.net/npm/konva@8.4.3/konva.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,500;0,900;1,500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://unpkg.com/konva@9/konva.min.js"></script>
 </head>
 <body>
-  <!-- Título -->
+
+  <!-- Container do título -->
   <div class="title-container">
-    <h1>Monte sua foto personalizada</h1>
-    <p>Escolha sua foto, selecione a moldura e baixe para compartilhar!</p>
+    <h1>Apoie nossa chapa!</h1>
+    <p>Adicione nossa moldura em sua foto de perfil e apoie nossa campanha!</p>
   </div>
 
-  <!-- Container principal -->
+  <!-- Container do editor -->
   <div class="container">
-    <!-- Switch das molduras -->
-    <div id="frame-switch" style="margin-bottom:15px; text-align:center;">
+
+    <!-- Switch de moldura -->
+    <div class="frame-switch">
       <label>
-        <input type="radio" name="frame" value="moldura.png" checked>
+        <input type="radio" name="frameOption" value="votante" checked>
         Sou votante
       </label>
-      <label style="margin-left:20px;">
-        <input type="radio" name="frame" value="moldura2.png">
+      <label>
+        <input type="radio" name="frameOption" value="apoiador">
         Sou apoiador
       </label>
     </div>
 
-    <!-- Editor -->
+    <!-- Canvas -->
     <div id="canvas-container"></div>
 
-    <!-- Botões -->
+    <!-- Controles -->
     <div class="controls">
-      <button id="choose-file">Escolher foto</button>
+      <button id="choose-file">Escolha sua foto</button>
       <input type="file" id="file-input" accept="image/*">
       <button id="download">Baixar foto</button>
     </div>
