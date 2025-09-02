@@ -1,224 +1,130 @@
-const canvasContainer = document.getElementById('canvas-container');
-const chooseFileBtn = document.getElementById('choose-file');
-const fileInput = document.getElementById('file-input');
-const downloadButton = document.getElementById('download');
+const stage = new Konva.Stage({
+  container: 'canvas-container',
+  width: document.getElementById('canvas-container').offsetWidth,
+  height: document.getElementById('canvas-container').offsetWidth,
+});
 
-let stage, sampleLayer, photoLayer, frameLayer, overlayLayer;
-let photo, frame, overlayImg, sampleImg, transformer;
-let lastDistance = 0;
+let photoLayer, frameLayer, overlayLayer;
+let photo, frame, overlay;
 
-const initCanvas = () => {
-  const containerSize = canvasContainer.offsetWidth;
+let currentFrameSrc = 'moldura.png'; // moldura padrão
 
-  stage = new Konva.Stage({
-    container: 'canvas-container',
-    width: containerSize,
-    height: containerSize
-  });
-
-  // Layer do sample (fundo)
-  sampleLayer = new Konva.Layer();
-  stage.add(sampleLayer);
-
-  const sample = new Image();
-  sample.src = 'sample.png';
-  sample.onload = () => {
-    sampleImg = new Konva.Image({
-      x: 0,
-      y: 0,
-      image: sample,
-      width: stage.width(),
-      height: stage.height(),
-      listening: false
-    });
-    sampleLayer.add(sampleImg);
-    sampleLayer.draw();
+// Função para carregar a moldura
+const loadFrame = (src) => {
+  const frameImage = new Image();
+  frameImage.src = src;
+  frameImage.onload = () => {
+    if (frame) {
+      frame.image(frameImage);
+    } else {
+      frame = new Konva.Image({
+        x: 0,
+        y: 0,
+        image: frameImage,
+        width: stage.width(),
+        height: stage.height(),
+        draggable: false,
+        listening: false
+      });
+      frameLayer.add(frame);
+    }
+    frameLayer.draw();
+    overlayLayer.moveToTop();
   };
+};
 
-  // Layer da foto do usuário
+// Inicializa o canvas
+function initCanvas() {
+  // Layer da foto
   photoLayer = new Konva.Layer();
   stage.add(photoLayer);
-
-  transformer = new Konva.Transformer({
-    nodes: [],
-    rotateEnabled: false,
-    enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right']
-  });
-  photoLayer.add(transformer);
 
   // Layer da moldura
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
-
-  const frameImage = new Image();
-  frameImage.src = 'moldura.png';
-  frameImage.onload = () => {
-    frame = new Konva.Image({
-      x: 0,
-      y: 0,
-      image: frameImage,
-      width: stage.width(),
-      height: stage.height(),
-      draggable: false,
-      listening: false
-    });
-    frameLayer.add(frame);
-    frameLayer.draw();
-  };
+  loadFrame(currentFrameSrc);
 
   // Layer do overlay
   overlayLayer = new Konva.Layer();
   stage.add(overlayLayer);
 
-  const overlayStatic = new Image();
-  overlayStatic.src = 'overlay.png';
-  overlayStatic.onload = () => {
-    overlayImg = new Konva.Image({
+  const overlayImage = new Image();
+  overlayImage.src = 'overlay.png';
+  overlayImage.onload = () => {
+    overlay = new Konva.Image({
       x: 0,
       y: 0,
-      image: overlayStatic,
+      image: overlayImage,
       width: stage.width(),
       height: stage.height(),
+      draggable: false,
       listening: false
     });
-    overlayLayer.add(overlayImg);
+    overlayLayer.add(overlay);
     overlayLayer.draw();
   };
+}
 
-  // Zoom com scroll
-  stage.on('wheel', (e) => {
-    if (!photo) return;
-    e.evt.preventDefault();
-    const oldScale = photo.scaleX();
-    const pointer = stage.getPointerPosition();
-    const scaleBy = 1.05;
-    const direction = e.evt.deltaY > 0 ? 1 / scaleBy : scaleBy;
-    photo.scaleX(photo.scaleX() * direction);
-    photo.scaleY(photo.scaleY() * direction);
+// Inicializar
+initCanvas();
 
-    const mousePointTo = {
-      x: (pointer.x - photo.x()) / oldScale,
-      y: (pointer.y - photo.y()) / oldScale
-    };
-    photo.x(pointer.x - mousePointTo.x * photo.scaleX());
-    photo.y(pointer.y - mousePointTo.y * photo.scaleY());
-
-    photoLayer.draw();
-  });
-};
+// Input e botões
+const fileInput = document.getElementById('file-input');
+const chooseFileButton = document.getElementById('choose-file');
+const downloadButton = document.getElementById('download');
 
 // Escolher arquivo
-chooseFileBtn.addEventListener('click', () => {
-  fileInput.value = '';
+chooseFileButton.addEventListener('click', () => {
   fileInput.click();
 });
 
-// Upload da foto
+// Upload de imagem
 fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = function (evt) {
     const img = new Image();
-    img.src = reader.result;
-    img.onload = () => {
-      const containerSize = stage.width();
-      const scaleX = containerSize / img.width;
-      const scaleY = containerSize / img.height;
-      const finalScale = Math.max(scaleX, scaleY);
-
-      const finalWidth = img.width * finalScale;
-      const finalHeight = img.height * finalScale;
-      const finalX = (containerSize - finalWidth) / 2;
-      const finalY = (containerSize - finalHeight) / 2;
-
-      // Remove sample
-      if (sampleImg) {
-        sampleImg.destroy();
-        sampleImg = null;
-        sampleLayer.draw();
+    img.src = evt.target.result;
+    img.onload = function () {
+      if (photo) {
+        photo.destroy();
       }
 
-      if (!photo) {
-        photo = new Konva.Image({
-          x: finalX,
-          y: finalY,
-          image: img,
-          width: finalWidth,
-          height: finalHeight,
-          draggable: true,
-          scaleX: 0,
-          scaleY: 0
-        });
-        photoLayer.add(photo);
-        transformer.nodes([photo]);
-      } else {
-        photo.image(img);
-        photo.setAttrs({
-          x: finalX,
-          y: finalY,
-          width: finalWidth,
-          height: finalHeight,
-          scaleX: 0,
-          scaleY: 0
-        });
-      }
-
-      // Animação do fit
-      const tween = new Konva.Tween({
-        node: photo,
-        duration: 0.5,
-        scaleX: 1,
-        scaleY: 1,
-        easing: Konva.Easings.EaseInOut
+      photo = new Konva.Image({
+        image: img,
+        x: stage.width() / 2,
+        y: stage.height() / 2,
+        draggable: true,
       });
-      tween.play();
 
-      overlayLayer.moveToTop();
-      frameLayer.draw();
+      const scale = Math.max(stage.width() / img.width, stage.height() / img.height);
+      photo.scale({ x: scale, y: scale });
+      photo.offsetX(img.width / 2);
+      photo.offsetY(img.height / 2);
+
+      photoLayer.add(photo);
       photoLayer.draw();
 
-      chooseFileBtn.textContent = 'Escolher outra foto';
+      frameLayer.moveToTop();
+      overlayLayer.moveToTop();
+
       downloadButton.style.display = 'inline-block';
     };
   };
   reader.readAsDataURL(file);
 });
 
-// Pinch-to-zoom celular
-canvasContainer.addEventListener('touchmove', (e) => {
-  if (!photo || e.touches.length !== 2) return;
-  e.preventDefault();
-
-  const touch1 = e.touches[0];
-  const touch2 = e.touches[1];
-  const dx = touch2.clientX - touch1.clientX;
-  const dy = touch2.clientY - touch1.clientY;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  if (lastDistance) {
-    const scaleChange = distance / lastDistance;
-    photo.scaleX(photo.scaleX() * scaleChange);
-    photo.scaleY(photo.scaleY() * scaleChange);
-
-    const centerX = (touch1.clientX + touch2.clientX) / 2 - canvasContainer.getBoundingClientRect().left;
-    const centerY = (touch1.clientY + touch2.clientY) / 2 - canvasContainer.getBoundingClientRect().top;
-    const oldScale = photo.scaleX() / scaleChange;
-    photo.x(centerX - (centerX - photo.x()) * (photo.scaleX() / oldScale));
-    photo.y(centerY - (centerY - photo.y()) * (photo.scaleY() / oldScale));
-  }
-
-  lastDistance = distance;
-  overlayLayer.moveToTop();
-  photoLayer.draw();
+// Troca de moldura pelo switch
+document.querySelectorAll('input[name="frame"]').forEach((radio) => {
+  radio.addEventListener('change', (e) => {
+    currentFrameSrc = e.target.value;
+    loadFrame(currentFrameSrc);
+  });
 });
 
-canvasContainer.addEventListener('touchend', (e) => {
-  if (e.touches.length < 2) lastDistance = 0;
-});
-
-// Download
+// Download da imagem final
 downloadButton.addEventListener('click', () => {
   if (!photo || !frame) return;
 
@@ -249,45 +155,3 @@ downloadButton.addEventListener('click', () => {
   a.download = 'foto_com_moldura.png';
   a.click();
 });
-
-// Redimensionamento responsivo
-window.addEventListener('resize', () => {
-  const newSize = canvasContainer.offsetWidth;
-  stage.width(newSize);
-  stage.height(newSize);
-
-  if (frame) {
-    frame.width(newSize);
-    frame.height(newSize);
-  }
-
-  if (overlayImg) {
-    overlayImg.width(newSize);
-    overlayImg.height(newSize);
-    overlayLayer.draw();
-  }
-
-  if (photo) {
-    const scale = Math.max(newSize / photo.getImage().width, newSize / photo.getImage().height);
-    photo.setAttrs({
-      x: (newSize - photo.getImage().width * scale) / 2,
-      y: (newSize - photo.getImage().height * scale) / 2,
-      scaleX: 1,
-      scaleY: 1,
-      width: photo.getImage().width * scale,
-      height: photo.getImage().height * scale
-    });
-  }
-
-  if (sampleImg) {
-    sampleImg.width(newSize);
-    sampleImg.height(newSize);
-    sampleLayer.draw();
-  }
-
-  overlayLayer.moveToTop();
-  frameLayer.draw();
-  photoLayer.draw();
-});
-
-initCanvas();
