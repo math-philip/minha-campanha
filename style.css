@@ -18,12 +18,8 @@ body {
 }
 
 @keyframes meshMove {
-  0% {
-    background-position: 0% 0%, 100% 0%, 0% 100%;
-  }
-  100% {
-    background-position: 100% 100%, 0% 100%, 100% 0%;
-  }
+  0% { background-position: 0% 0%, 100% 0%, 0% 100%; }
+  100% { background-position: 100% 100%, 0% 100%, 100% 0%; }
 }
 
 /* Container do título */
@@ -66,18 +62,15 @@ body {
 
 /* Switch de moldura */
 .frame-switch {
-  margin-bottom: 15px;
   display: flex;
   justify-content: center;
   gap: 20px;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #0030b5;
+  margin-bottom: 15px;
 }
 
-.frame-switch input[type="radio"] {
-  margin-right: 6px;
-  accent-color: #1e6dec; /* azul para combinar */
+.frame-switch label {
+  font-weight: 500;
+  cursor: pointer;
 }
 
 /* Canvas */
@@ -128,16 +121,6 @@ body {
     padding: 15px;  /* padding lateral maior */
   }
 
-  .title-container h1 {
-    font-size: 1.4rem; /* título menor no celular */
-  }
-
-  .title-container p {
-    font-size: 0.9rem; /* subtítulo um pouco menor */
-  }
-
-  .frame-switch {
-    flex-direction: column;
-    gap: 8px;
-  }
+  .title-container h1 { font-size: 1.4rem; }
+  .title-container p { font-size: 0.9rem; }
 }
