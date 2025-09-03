@@ -24,9 +24,9 @@ body {
 /* Logo no topo */
 .top-logo {
   display: block;
-  max-width: 300px; /* ajusta largura máxima */
-  width: 50%;       /* ocupa 50% da tela em desktops */
-  height: auto;     /* mantém proporção */
+  max-width: 300px;
+  width: 50%;
+  height: auto;
   margin-bottom: 20px;
 }
 
@@ -43,18 +43,18 @@ body {
 }
 
 .title-container h1 {
-  font-weight: 900; /* Montserrat Black */
+  font-weight: 900;
   font-size: 1.8rem;
   margin: 0 0 10px 0;
-  color: #0030b5; /* título azul */
+  color: #0030b5;
 }
 
 .title-container p {
-  font-weight: 500; /* Montserrat Medium */
+  font-weight: 500;
   font-style: italic;
   font-size: 1rem;
   margin: 0;
-  color: black; /* subtítulo preto */
+  color: black;
 }
 
 /* Container do editor */
@@ -77,7 +77,7 @@ body {
 }
 
 .frame-switch input[type="radio"] {
-  display: none; /* esconde o radio padrão */
+  display: none;
 }
 
 .frame-switch label {
@@ -117,7 +117,7 @@ body {
 
 .controls button {
   padding: 10px 20px;
-  background-color: #0eb287; /* Escolha sua foto */
+  background-color: #0eb287;
   color: white;
   border: none;
   border-radius: 5px;
@@ -131,9 +131,34 @@ body {
 }
 
 #download {
-  display: none; /* só aparece depois que a pessoa escolher a foto */
-  background-color: #1e6dec; /* botão Baixar foto */
+  display: none;
+  background-color: #1e6dec;
   color: white;
+}
+
+/* Notificação de sucesso */
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100%);
+  background-color: #8bd96c;
+  color: white;
+  padding: 15px 25px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: all 0.5s ease;
+}
+
+.notification.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 
 /* Responsivo para celulares */
