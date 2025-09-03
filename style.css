@@ -68,17 +68,32 @@ body {
   text-align: center;
 }
 
-/* Switch de moldura */
+/* Switch de moldura estilizado */
 .frame-switch {
   display: flex;
   justify-content: center;
-  gap: 20px;
+  gap: 15px;
   margin-bottom: 15px;
 }
 
+.frame-switch input[type="radio"] {
+  display: none; /* esconde o radio padrão */
+}
+
 .frame-switch label {
-  font-weight: 500;
+  padding: 10px 20px;
+  border: 2px solid #1e6dec;
+  border-radius: 8px;
+  color: #1e6dec;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.frame-switch input[type="radio"]:checked + label {
+  background-color: #1e6dec;
+  color: white;
 }
 
 /* Canvas */
