@@ -53,9 +53,9 @@ const initCanvas = () => {
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
-  // Pré-carregar molduras
+  // Pré-carregar molduras atualizadas
   const votanteImg = new Image();
-  votanteImg.src = 'moldura.png';
+  votanteImg.src = 'Twibbon-Eu-Voto2.png';
   votanteImg.onload = () => {
     frameVotanteImg = new Konva.Image({
       x: 0,
@@ -71,7 +71,7 @@ const initCanvas = () => {
   };
 
   const apoiadorImg = new Image();
-  apoiadorImg.src = 'moldura2.png';
+  apoiadorImg.src = 'Twibbon-Eu-Apoio2.png';
   apoiadorImg.onload = () => {
     frameApoiadorImg = new Konva.Image({
       x: 0,
