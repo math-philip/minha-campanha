@@ -11,32 +11,21 @@ let lastDistance = 0;
 // Objetos de moldura pré-carregados
 let frameVotanteImg, frameApoiadorImg;
 
-// Criar notificação
+// Criar notificação com animação
 const notification = document.createElement('div');
-notification.style.position = 'fixed';
-notification.style.bottom = '20px';
-notification.style.left = '50%';
-notification.style.transform = 'translateX(-50%)';
-notification.style.backgroundColor = '#8bd96c';
-notification.style.color = 'white';
-notification.style.padding = '15px 25px';
-notification.style.borderRadius = '10px';
-notification.style.fontWeight = '600';
-notification.style.fontFamily = 'Montserrat, sans-serif';
-notification.style.fontSize = '1rem';
-notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-notification.style.display = 'none';
-notification.style.zIndex = '9999';
+notification.className = 'notification'; // usar CSS para animação
 document.body.appendChild(notification);
 
 const showNotification = (msg, duration = 5000) => {
   notification.textContent = msg;
-  notification.style.display = 'block';
+  notification.classList.add('show');
+
   setTimeout(() => {
-    notification.style.display = 'none';
+    notification.classList.remove('show');
   }, duration);
 };
 
+// Inicialização do canvas
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
 
@@ -79,7 +68,7 @@ const initCanvas = () => {
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
-  // Pré-carregar molduras atualizadas
+  // Pré-carregar molduras
   const votanteImg = new Image();
   votanteImg.src = 'Twibbon-Eu-Voto2.png';
   votanteImg.onload = () => {
@@ -188,7 +177,6 @@ fileInput.addEventListener('change', (e) => {
       const finalX = (containerSize - finalWidth)/2;
       const finalY = (containerSize - finalHeight)/2;
 
-      // Remove sample
       sampleLayer.destroyChildren();
       sampleLayer.draw();
 
@@ -249,7 +237,7 @@ canvasContainer.addEventListener('touchmove', (e) => {
 });
 canvasContainer.addEventListener('touchend', (e)=>{if(e.touches.length<2) lastDistance=0;});
 
-// Download JPG 100% e mostrar notificação
+// Download JPG 100% e mostrar notificação animada
 downloadButton.addEventListener('click', () => {
   if(!photo) return;
   const downloadSize = 800;
@@ -258,28 +246,25 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
 
-  // Fundo branco para evitar transparência
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0,0,downloadSize,downloadSize);
 
-  // Foto
   const scaleX = photo.width()*photo.scaleX()/stage.width();
   const scaleY = photo.height()*photo.scaleY()/stage.height();
   const posX = photo.x()/stage.width()*downloadSize;
   const posY = photo.y()/stage.height()*downloadSize;
   ctx.drawImage(photo.getImage(), posX, posY, scaleX*downloadSize, scaleY*downloadSize);
 
-  // Frame visível
   if(frameVotanteImg && frameVotanteImg.visible()) ctx.drawImage(frameVotanteImg.image(), 0, 0, downloadSize, downloadSize);
   if(frameApoiadorImg && frameApoiadorImg.visible()) ctx.drawImage(frameApoiadorImg.image(), 0, 0, downloadSize, downloadSize);
 
-  const dataURL = mergedCanvas.toDataURL('image/jpeg',1.0); // JPG qualidade 100%
+  const dataURL = mergedCanvas.toDataURL('image/jpeg',1.0);
   const a = document.createElement('a');
   a.href = dataURL;
   a.download = 'foto_com_moldura.jpg';
   a.click();
 
-  // Mostrar notificação
+  // Notificação animada
   showNotification('Foto baixada com sucesso! Compartilhe com os amigos!', 5000);
 });
 
