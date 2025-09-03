@@ -2,12 +2,10 @@ const canvasContainer = document.getElementById('canvas-container');
 const chooseFileBtn = document.getElementById('choose-file');
 const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
-const frameSwitch = document.querySelectorAll('input[name="frameOption"]');
 
 let stage, sampleLayer, photoLayer, frameLayer, overlayLayer;
 let photo, frame, overlayImg, sampleImg, transformer;
 let lastDistance = 0;
-let currentFrameSrc = 'moldura.png';
 
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
@@ -52,26 +50,21 @@ const initCanvas = () => {
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
-  const loadFrame = (src) => {
-    const frameImage = new Image();
-    frameImage.src = src;
-    frameImage.onload = () => {
-      if (frame) frame.destroy();
-      frame = new Konva.Image({
-        x: 0,
-        y: 0,
-        image: frameImage,
-        width: stage.width(),
-        height: stage.height(),
-        draggable: false,
-        listening: false
-      });
-      frameLayer.add(frame);
-      frameLayer.draw();
-    };
+  const frameImage = new Image();
+  frameImage.src = 'moldura.png';
+  frameImage.onload = () => {
+    frame = new Konva.Image({
+      x: 0,
+      y: 0,
+      image: frameImage,
+      width: stage.width(),
+      height: stage.height(),
+      draggable: false,
+      listening: false
+    });
+    frameLayer.add(frame);
+    frameLayer.draw();
   };
-
-  loadFrame(currentFrameSrc);
 
   // Layer do overlay
   overlayLayer = new Konva.Layer();
@@ -113,31 +106,6 @@ const initCanvas = () => {
     photoLayer.draw();
   });
 };
-
-// Switch de moldura
-frameSwitch.forEach(input => {
-  input.addEventListener('change', () => {
-    currentFrameSrc = input.value === 'votante' ? 'moldura.png' : 'moldura2.png';
-    if (frameLayer && frameLayer.children.length > 0) {
-      frame.destroy();
-      const frameImage = new Image();
-      frameImage.src = currentFrameSrc;
-      frameImage.onload = () => {
-        frame = new Konva.Image({
-          x: 0,
-          y: 0,
-          image: frameImage,
-          width: stage.width(),
-          height: stage.height(),
-          draggable: false,
-          listening: false
-        });
-        frameLayer.add(frame);
-        frameLayer.draw();
-      };
-    }
-  });
-});
 
 // Escolher arquivo
 chooseFileBtn.addEventListener('click', () => {
@@ -197,6 +165,7 @@ fileInput.addEventListener('change', (e) => {
         });
       }
 
+      // Animação do fit
       const tween = new Konva.Tween({
         node: photo,
         duration: 0.5,
@@ -249,7 +218,7 @@ canvasContainer.addEventListener('touchend', (e) => {
   if (e.touches.length < 2) lastDistance = 0;
 });
 
-// Download
+// Download em JPG 100%
 downloadButton.addEventListener('click', () => {
   if (!photo || !frame) return;
 
@@ -259,11 +228,16 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
 
+  // Fundo branco para evitar transparência
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, downloadSize, downloadSize);
+
   const scaleX = photo.width() * photo.scaleX() / stage.width();
   const scaleY = photo.height() * photo.scaleY() / stage.height();
   const posX = photo.x() / stage.width() * downloadSize;
   const posY = photo.y() / stage.height() * downloadSize;
 
+  // Desenha a foto
   ctx.drawImage(
     photo.getImage(),
     posX,
@@ -272,12 +246,14 @@ downloadButton.addEventListener('click', () => {
     scaleY * downloadSize
   );
 
+  // Desenha a moldura
   ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
 
-  const dataURL = mergedCanvas.toDataURL('image/png');
+  // Gera JPG com qualidade 100%
+  const dataURL = mergedCanvas.toDataURL('image/jpeg', 1);
   const a = document.createElement('a');
   a.href = dataURL;
-  a.download = 'foto_com_moldura.png';
+  a.download = 'foto_com_moldura.jpg';
   a.click();
 });
 
@@ -294,7 +270,7 @@ window.addEventListener('resize', () => {
 
   if (overlayImg) {
     overlayImg.width(newSize);
-    overlayImg.height(newSize);
+    overlayImg.height = newSize;
     overlayLayer.draw();
   }
 
