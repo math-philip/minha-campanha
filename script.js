@@ -11,17 +11,55 @@ let lastDistance = 0;
 // Objetos de moldura pré-carregados
 let frameVotanteImg, frameApoiadorImg;
 
-// Criar notificação com animação
+// Criar notificação responsiva
 const notification = document.createElement('div');
-notification.className = 'notification'; // usar CSS para animação
+notification.style.position = 'fixed';
+notification.style.bottom = '20px';
+notification.style.left = '50%';
+notification.style.transform = 'translateX(-50%)';
+notification.style.backgroundColor = '#8bd96c';
+notification.style.color = 'white';
+notification.style.borderRadius = '10px';
+notification.style.fontWeight = '600';
+notification.style.fontFamily = 'Montserrat, sans-serif';
+notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+notification.style.display = 'none';
+notification.style.zIndex = '9999';
+notification.style.minWidth = '250px';
+notification.style.maxWidth = '90%';
+notification.style.textAlign = 'center';
+notification.style.wordWrap = 'break-word';
+
+// Ajustar padding e font-size conforme tamanho da tela
+const adjustNotificationStyle = () => {
+  if (window.innerWidth <= 480) { // celular
+    notification.style.padding = '20px 15px';
+    notification.style.fontSize = '1rem';
+  } else { // desktop
+    notification.style.padding = '15px 25px';
+    notification.style.fontSize = '1rem';
+  }
+};
+adjustNotificationStyle();
+window.addEventListener('resize', adjustNotificationStyle);
+
 document.body.appendChild(notification);
 
+// Função para mostrar notificação
 const showNotification = (msg, duration = 5000) => {
   notification.textContent = msg;
-  notification.classList.add('show');
+  notification.style.display = 'block';
+  notification.style.opacity = '0';
+  notification.style.transition = 'opacity 0.4s ease';
+  requestAnimationFrame(() => {
+    notification.style.opacity = '1';
+  });
 
   setTimeout(() => {
-    notification.classList.remove('show');
+    notification.style.opacity = '0';
+    setTimeout(() => {
+      notification.style.display = 'none';
+    }, 400);
   }, duration);
 };
 
@@ -237,7 +275,7 @@ canvasContainer.addEventListener('touchmove', (e) => {
 });
 canvasContainer.addEventListener('touchend', (e)=>{if(e.touches.length<2) lastDistance=0;});
 
-// Download JPG 100% e mostrar notificação animada
+// Download JPG 100% e mostrar notificação
 downloadButton.addEventListener('click', () => {
   if(!photo) return;
   const downloadSize = 800;
@@ -264,8 +302,8 @@ downloadButton.addEventListener('click', () => {
   a.download = 'foto_com_moldura.jpg';
   a.click();
 
-  // Notificação animada
-  showNotification('Foto baixada com sucesso! Compartilhe com os amigos!', 5000);
+  // Notificação responsiva
+  showNotification('Foto baixada com sucesso! Compartilhe com os amigos!', 10000);
 });
 
 // Redimensionamento responsivo
