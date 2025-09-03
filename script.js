@@ -11,6 +11,32 @@ let lastDistance = 0;
 // Objetos de moldura pré-carregados
 let frameVotanteImg, frameApoiadorImg;
 
+// Criar notificação
+const notification = document.createElement('div');
+notification.style.position = 'fixed';
+notification.style.bottom = '20px';
+notification.style.left = '50%';
+notification.style.transform = 'translateX(-50%)';
+notification.style.backgroundColor = '#8bd96c';
+notification.style.color = 'white';
+notification.style.padding = '15px 25px';
+notification.style.borderRadius = '10px';
+notification.style.fontWeight = '600';
+notification.style.fontFamily = 'Montserrat, sans-serif';
+notification.style.fontSize = '1rem';
+notification.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
+notification.style.display = 'none';
+notification.style.zIndex = '9999';
+document.body.appendChild(notification);
+
+const showNotification = (msg, duration = 5000) => {
+  notification.textContent = msg;
+  notification.style.display = 'block';
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, duration);
+};
+
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
 
@@ -223,7 +249,7 @@ canvasContainer.addEventListener('touchmove', (e) => {
 });
 canvasContainer.addEventListener('touchend', (e)=>{if(e.touches.length<2) lastDistance=0;});
 
-// Download JPG 100%
+// Download JPG 100% e mostrar notificação
 downloadButton.addEventListener('click', () => {
   if(!photo) return;
   const downloadSize = 800;
@@ -252,6 +278,9 @@ downloadButton.addEventListener('click', () => {
   a.href = dataURL;
   a.download = 'foto_com_moldura.jpg';
   a.click();
+
+  // Mostrar notificação
+  showNotification('Foto baixada com sucesso! Compartilhe com os amigos!', 5000);
 });
 
 // Redimensionamento responsivo
@@ -262,7 +291,7 @@ window.addEventListener('resize', () => {
 
   if(frameVotanteImg) {frameVotanteImg.width(newSize); frameVotanteImg.height(newSize);}
   if(frameApoiadorImg) {frameApoiadorImg.width(newSize); frameApoiadorImg.height(newSize);}
-  if(overlayLayer) overlayLayer.getChildren().forEach(img=>img.width(newSize), img.height(newSize));
+  if(overlayLayer) overlayLayer.getChildren().forEach(img=>{img.width(newSize); img.height(newSize);});
   if(photo) {
     const scale = Math.max(newSize/photo.getImage().width,newSize/photo.getImage().height);
     photo.setAttrs({
