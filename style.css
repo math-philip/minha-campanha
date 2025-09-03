@@ -22,6 +22,15 @@ body {
   100% { background-position: 100% 100%, 0% 100%, 100% 0%; }
 }
 
+/* Logo no topo */
+.top-logo {
+  display: block;
+  max-width: 300px; /* ajusta largura máxima */
+  width: 50%;       /* ocupa 50% da tela em desktops */
+  height: auto;     /* mantém proporção */
+  margin-bottom: 20px;
+}
+
 /* Container do título */
 .title-container {
   background-color: white;
@@ -115,10 +124,15 @@ body {
 
 /* Responsivo para celulares */
 @media (max-width: 480px) {
+  .top-logo {
+    max-width: 200px;
+    width: 70%;
+  }
+
   .title-container,
   .container {
-    max-width: 90%; /* ocupa menos espaço no celular */
-    padding: 15px;  /* padding lateral maior */
+    max-width: 90%;
+    padding: 15px;
   }
 
   .title-container h1 { font-size: 1.4rem; }
