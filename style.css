@@ -9,17 +9,16 @@ body {
   min-height: 100vh;
   padding: 20px;
 
-  /* Fundo gradiente azul animado */
-  background: radial-gradient(circle at 20% 30%, #1e6dec, #0030b5 80%),
-              radial-gradient(circle at 80% 70%, #0030b5, #1e6dec 80%),
-              radial-gradient(circle at 50% 50%, #1e6dec, #0030b5 80%);
-  background-size: 200% 200%;
-  animation: meshMove 15s ease-in-out infinite alternate;
+  /* Fundo gradiente animado */
+  background: linear-gradient(-45deg, #0030b5, #1e6dec, #002384, #8bd96c);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
 }
 
-@keyframes meshMove {
-  0% { background-position: 0% 0%, 100% 0%, 0% 100%; }
-  100% { background-position: 100% 100%, 0% 100%, 100% 0%; }
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 /* Logo no topo */
