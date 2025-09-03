@@ -2,10 +2,12 @@ const canvasContainer = document.getElementById('canvas-container');
 const chooseFileBtn = document.getElementById('choose-file');
 const fileInput = document.getElementById('file-input');
 const downloadButton = document.getElementById('download');
+const frameSwitch = document.querySelectorAll('input[name="frameOption"]');
 
 let stage, sampleLayer, photoLayer, frameLayer, overlayLayer;
 let photo, frame, overlayImg, sampleImg, transformer;
 let lastDistance = 0;
+let currentFrameSrc = 'moldura.png';
 
 const initCanvas = () => {
   const containerSize = canvasContainer.offsetWidth;
@@ -50,21 +52,26 @@ const initCanvas = () => {
   frameLayer = new Konva.Layer();
   stage.add(frameLayer);
 
-  const frameImage = new Image();
-  frameImage.src = 'moldura.png';
-  frameImage.onload = () => {
-    frame = new Konva.Image({
-      x: 0,
-      y: 0,
-      image: frameImage,
-      width: stage.width(),
-      height: stage.height(),
-      draggable: false,
-      listening: false
-    });
-    frameLayer.add(frame);
-    frameLayer.draw();
+  const loadFrame = (src) => {
+    const frameImage = new Image();
+    frameImage.src = src;
+    frameImage.onload = () => {
+      if (frame) frame.destroy();
+      frame = new Konva.Image({
+        x: 0,
+        y: 0,
+        image: frameImage,
+        width: stage.width(),
+        height: stage.height(),
+        draggable: false,
+        listening: false
+      });
+      frameLayer.add(frame);
+      frameLayer.draw();
+    };
   };
+
+  loadFrame(currentFrameSrc);
 
   // Layer do overlay
   overlayLayer = new Konva.Layer();
@@ -106,6 +113,31 @@ const initCanvas = () => {
     photoLayer.draw();
   });
 };
+
+// Switch de moldura
+frameSwitch.forEach(input => {
+  input.addEventListener('change', () => {
+    currentFrameSrc = input.value === 'votante' ? 'moldura.png' : 'moldura2.png';
+    if (frameLayer && frameLayer.children.length > 0) {
+      if (frame) frame.destroy();
+      const frameImage = new Image();
+      frameImage.src = currentFrameSrc;
+      frameImage.onload = () => {
+        frame = new Konva.Image({
+          x: 0,
+          y: 0,
+          image: frameImage,
+          width: stage.width(),
+          height: stage.height(),
+          draggable: false,
+          listening: false
+        });
+        frameLayer.add(frame);
+        frameLayer.draw();
+      };
+    }
+  });
+});
 
 // Escolher arquivo
 chooseFileBtn.addEventListener('click', () => {
@@ -165,7 +197,6 @@ fileInput.addEventListener('change', (e) => {
         });
       }
 
-      // Animação do fit
       const tween = new Konva.Tween({
         node: photo,
         duration: 0.5,
@@ -228,7 +259,7 @@ downloadButton.addEventListener('click', () => {
   mergedCanvas.height = downloadSize;
   const ctx = mergedCanvas.getContext('2d');
 
-  // Fundo branco para evitar transparência
+  // Fundo branco
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, downloadSize, downloadSize);
 
@@ -237,19 +268,9 @@ downloadButton.addEventListener('click', () => {
   const posX = photo.x() / stage.width() * downloadSize;
   const posY = photo.y() / stage.height() * downloadSize;
 
-  // Desenha a foto
-  ctx.drawImage(
-    photo.getImage(),
-    posX,
-    posY,
-    scaleX * downloadSize,
-    scaleY * downloadSize
-  );
-
-  // Desenha a moldura
+  ctx.drawImage(photo.getImage(), posX, posY, scaleX * downloadSize, scaleY * downloadSize);
   ctx.drawImage(frame.getImage(), 0, 0, downloadSize, downloadSize);
 
-  // Gera JPG com qualidade 100%
   const dataURL = mergedCanvas.toDataURL('image/jpeg', 1);
   const a = document.createElement('a');
   a.href = dataURL;
